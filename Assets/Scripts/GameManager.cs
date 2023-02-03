@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public GameStats GetStats => _stats;
 
     [SerializeField] private GameStats _stats;
+    private Player _player;
 
     private void Awake()
     {

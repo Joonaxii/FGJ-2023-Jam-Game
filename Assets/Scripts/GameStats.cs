@@ -11,11 +11,14 @@ public class GameStats
     [SerializeField] private float _baseCPUPower      = 1.0f;
     [SerializeField] private float _startingBits      = 32;
     [SerializeField] private float _baseBitCapacity   = 64;
+    [SerializeField] private float _baseScanInterval  = 180.0f;
+    [SerializeField] private float _baseScanDuration  = 20.0f;
 
     private float _bits;
     private float _bitsPerSecond;
     private float _bitCapacity;
     private float _cpuPower;
+    private float _scanTimer;
 
     public void Reset()
     {
@@ -23,6 +26,11 @@ public class GameStats
         _bitsPerSecond = _baseBitsPerSecond;
         _bitCapacity = _baseBitCapacity;
         _cpuPower = _baseCPUPower;
+    }
+
+    public void ResetScanTimer()
+    {
+        _scanTimer = _baseScanInterval;
     }
 
     public int GetBits() => Mathf.FloorToInt(_bits);

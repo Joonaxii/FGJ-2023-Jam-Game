@@ -47,6 +47,8 @@ public class GameBoard : MonoBehaviour
 
     private Transform _gridRoot;
     private SpriteRenderer[] _glowRends;
+    private int _width;
+    private int _height;
 
     private void Start()
     {
@@ -68,6 +70,8 @@ public class GameBoard : MonoBehaviour
         }
     }
 
+    public bool IsInBounds(Vector2Int point) { return point.x >= 0 &&  }
+
     public void Generate(int width, int height)
     {
         if(_glowRends != null)
@@ -79,33 +83,31 @@ public class GameBoard : MonoBehaviour
             _glowRends = null;
         }
 
-        width = Mathf.Clamp(width, 1, 255);
-        height = Mathf.Clamp(height, 1, 255);
+        _width = Mathf.Clamp(width, 1, 255);
+        _height = Mathf.Clamp(height, 1, 255);
 
-        width  += (width  & 0x1) == 0 ? 1 : 0; 
-        height += (height & 0x1) == 0 ? 1 : 0;
+        _width  += (_width  & 0x1) == 0 ? 1 : 0;
+        _height += (_width & 0x1) == 0 ? 1 : 0;
 
-        int center = (height >> 1) * width + width >> 1;
-        _board = new BoardTile[width * height];
+        int center = (_height >> 1) * _width + _width >> 1;
+        _board = new BoardTile[_width * _height];
 
         ref BoardTile mainTile = ref _board[center];
 
         mainTile.type = TileType.MainBase;
         mainTile.flags = TileFlags.PermaHack;
 
-        float wSize = (width  * 0.5f + PADDING * 0.5f);
-        float hSize = (height * 0.5f + PADDING * 0.5f);
+        float wSize = (_width  * 0.5f + PADDING * 0.5f);
+        float hSize = (_height * 0.5f + PADDING * 0.5f);
 
         _glowRends = new SpriteRenderer[_board.Length];
 
-
-        Debug.Log($"{wSize}, {hSize}");
         float baseY = -hSize;
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < _height; y++)
         {
-            int yP = y * width;
+            int yP = y * _width;
             float baseX = -wSize;
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < _width; x++)
             {
                 int ind = yP + x;
                 ref BoardTile tile = ref _board[ind];
@@ -113,6 +115,7 @@ public class GameBoard : MonoBehaviour
                 _glowRends[ind] = new GameObject($"Glow #{ind}").AddComponent<SpriteRenderer>();
                 var trGlow = _glowRends[ind].transform;
                 _glowRends[ind].sprite = gridGlow;
+                _glowRends[ind].color = new Color(1, 1, 1, 0.75f);
 
                 tile.worldPos = new Vector3(baseX - 0.5f, 0, baseY - 0.5f);
                 trGlow.eulerAngles = new Vector3(-90, 0, 0);
@@ -123,6 +126,7 @@ public class GameBoard : MonoBehaviour
             baseY += 1.0f + PADDING;
         }
     }
+
     public void RefreshStats(out float addBPS, out float addBCap, out float speedMod)
     {
         addBPS = 0;
