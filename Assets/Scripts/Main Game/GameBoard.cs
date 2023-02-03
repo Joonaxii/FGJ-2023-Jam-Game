@@ -1,4 +1,8 @@
+using System.Diagnostics;
+using UnityEditor.Build.Content;
 using UnityEngine;
+
+using Debug = UnityEngine.Debug;
 
 public class GameBoard : MonoBehaviour
 {
@@ -38,8 +42,17 @@ public class GameBoard : MonoBehaviour
         public Vector3 worldPos;
     }
 
+    public Sprite gridGlow;
     private BoardTile[] _board;
 
+    private Transform _gridRoot;
+    private SpriteRenderer[] _glowRends;
+
+    private void Start()
+    {
+        _gridRoot = transform.Find("GridGlow");
+        Generate(31, 31);
+    }
     public static float TileTypeToBitCost(TileType type, float difficultyMult = 1.0f)
     {
         switch (type)
@@ -57,6 +70,15 @@ public class GameBoard : MonoBehaviour
 
     public void Generate(int width, int height)
     {
+        if(_glowRends != null)
+        {
+            foreach (var item in _glowRends)
+            {
+                Destroy(item.gameObject);
+            }
+            _glowRends = null;
+        }
+
         width = Mathf.Clamp(width, 1, 255);
         height = Mathf.Clamp(height, 1, 255);
 
@@ -71,9 +93,13 @@ public class GameBoard : MonoBehaviour
         mainTile.type = TileType.MainBase;
         mainTile.flags = TileFlags.PermaHack;
 
-        float wSize = (width  * PADDING * 0.5f);
-        float hSize = (height * PADDING * 0.5f);
+        float wSize = (width  * 0.5f + PADDING * 0.5f);
+        float hSize = (height * 0.5f + PADDING * 0.5f);
 
+        _glowRends = new SpriteRenderer[_board.Length];
+
+
+        Debug.Log($"{wSize}, {hSize}");
         float baseY = -hSize;
         for (int y = 0; y < height; y++)
         {
@@ -84,20 +110,46 @@ public class GameBoard : MonoBehaviour
                 int ind = yP + x;
                 ref BoardTile tile = ref _board[ind];
 
-                tile.worldPos = new Vector3(baseX, 0, baseY);
+                _glowRends[ind] = new GameObject($"Glow #{ind}").AddComponent<SpriteRenderer>();
+                var trGlow = _glowRends[ind].transform;
+                _glowRends[ind].sprite = gridGlow;
+
+                tile.worldPos = new Vector3(baseX - 0.5f, 0, baseY - 0.5f);
+                trGlow.eulerAngles = new Vector3(-90, 0, 0);
+                trGlow.position = tile.worldPos;
 
                 baseX += 1.0f + PADDING;
             }
             baseY += 1.0f + PADDING;
         }
     }
-
-    public void RefreshStats()
+    public void RefreshStats(out float addBPS, out float addBCap, out float speedMod)
     {
-        //float add
-        //for (int i = 0; i < length; i++)
-        //{
+        addBPS = 0;
+        addBCap = 0;
+        speedMod = 1.0f;
+        for (int i = 0; i < _board.Length; i++)
+        {
+            ref BoardTile tile = ref _board[i];
 
-        //}
+            float mult = tile.flags.HasFlag(TileFlags.Overclocked) ? 3.0f : 1.0f;
+            if(tile.flags.HasFlag(TileFlags.PermaHack) || tile.flags.HasFlag(TileFlags.Hacked))
+            {
+                switch (tile.type)
+                {
+                    case TileType.BitCapacitor:
+                        addBCap += 16 * mult;
+                        break;
+                    case TileType.BitGenerator:
+                        addBPS += 0.5f * mult;
+                        break;
+                    case TileType.CPU:
+                        speedMod += 0.25f * mult;
+                        break;
+                }
+            }
+        }
     }
+
+
 }
