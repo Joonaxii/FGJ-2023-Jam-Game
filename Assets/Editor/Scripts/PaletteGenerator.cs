@@ -35,7 +35,7 @@ public class PaletteGenerator : EditorWindow
         _propMain = _so.FindProperty("_main");
         _propAlt = _so.FindProperty("_alt");
 
-        if (_paletteTex != null)
+        if (_paletteTex == null)
         {
             _paletteTex = new Texture2D(8, 2, TextureFormat.RGB24, false);
             _paletteTex.filterMode = FilterMode.Point;
@@ -56,12 +56,14 @@ public class PaletteGenerator : EditorWindow
     {
         string path = $"{Application.dataPath}/Palettes/Configs/";
         Directory.CreateDirectory(path);
-        path += "Palette Conf.config";
+        path += "Palette Conf.cfg";
 
         if (File.Exists(path))
         {
             using (FileStream fs = new FileStream(path, FileMode.Open))
+            using(var br = new BinaryReader(fs))
             {
+                _name = br.ReadString();
                 _main.Read(fs);
                 _alt.Read(fs);
             }
@@ -72,10 +74,12 @@ public class PaletteGenerator : EditorWindow
     {
         string path = $"{Application.dataPath}/Palettes/Configs/";
         Directory.CreateDirectory(path);
-        path += "Palette Conf.config";
+        path += "Palette Conf.cfg";
 
         using (FileStream fs = new FileStream(path, FileMode.Create))
+        using (var bw = new BinaryWriter(fs))
         {
+             bw.Write(_name);
             _main.Write(fs);
             _alt.Write(fs);
         }
@@ -85,9 +89,8 @@ public class PaletteGenerator : EditorWindow
     {
         _so.Update();
 
-        EditorGUILayout.PropertyField(_propName, new GUIContent("Palette Name"), true);
-
         EditorGUI.BeginChangeCheck();
+        EditorGUILayout.PropertyField(_propName, new GUIContent("Palette Name"), true);
         _main.DrawGuiLayout(_propMain, new GUIContent("Main Palette"));
         _alt.DrawGuiLayout(_propAlt, new GUIContent("Alternate Palette"));
         bool changed = EditorGUI.EndChangeCheck();
@@ -113,6 +116,7 @@ public class PaletteGenerator : EditorWindow
             string path = $"{Application.dataPath}/Palettes/";
             Directory.CreateDirectory(path);
             File.WriteAllBytes($"{path}{_name}.png", _paletteTex.EncodeToPNG());
+            AssetDatabase.Refresh();
         }
 
         GUI.enabled = true;
@@ -122,9 +126,15 @@ public class PaletteGenerator : EditorWindow
     [Serializable]
     public unsafe struct Palette
     {
-        public fixed uint colors[8];
+        public fixed float colors[8 * 4];
 
-        public Color32 AsColor(int index) { return *(Color32*)(colors[index]); }
+        public Color AsColor(int index) 
+        { 
+            fixed(float* ptr = colors)
+            {
+                return *(Color*)(ptr + (index * 4));
+            }
+        }
 
         public void DrawGuiLayout(SerializedProperty prop, GUIContent label)
         {
@@ -133,12 +143,12 @@ public class PaletteGenerator : EditorWindow
             {
 
                 EditorGUI.indentLevel++;
-                fixed (uint* col = colors)
+                fixed (float* col = colors)
                 {
-                    Color32* cPtr = (Color32*)col;
+                    Color* cPtr = (Color*)col;
                     for (int i = 0; i < 8; i++)
                     {
-                        cPtr[i] = EditorGUILayout.ColorField($"Color #{i}" , cPtr[i]);
+                        cPtr[i] = EditorGUILayout.ColorField(new GUIContent($"Color #{i}"), cPtr[i], true, false, true);
                     }
                 }
                 EditorGUI.indentLevel--;
@@ -147,18 +157,18 @@ public class PaletteGenerator : EditorWindow
 
         public void Read(Stream stream)
         {
-            fixed (uint* col = colors)
+            fixed (float* col = colors)
             {
-                Span<byte> buf = new Span<byte>(col, 8 * 4);
+                Span<byte> buf = new Span<byte>(col, 8 * 4 * 4);
                 stream.Read(buf);
             }
         }
 
         public void Write(Stream stream)
         {
-            fixed (uint* col = colors)
+            fixed (float* col = colors)
             {
-                Span<byte> buf = new Span<byte>(col, 8 * 4);
+                Span<byte> buf = new Span<byte>(col, 8 * 4 * 4);
                 stream.Write(buf);
             }
         }
