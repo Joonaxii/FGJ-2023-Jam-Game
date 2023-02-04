@@ -12,6 +12,15 @@ ModelImporter:
   - first:
       74: 487678059063423859
     second: Armature.005|WarehouseWobble
+  - first:
+      74: -7103376241416519554
+    second: TubeAmpArmature|ClockTowerWobble
+  - first:
+      74: 7396392409040472595
+    second: TubeAmpArmature|TubeAmp
+  - first:
+      74: -8216084306922784107
+    second: TubeAmpArmature|WarehouseWobble
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -44,7 +53,7 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 0.1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -97,7 +106,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
+    globalScale: 0.1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

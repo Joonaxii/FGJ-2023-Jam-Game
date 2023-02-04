@@ -45,6 +45,63 @@ ModelImporter:
   - first:
       74: 2002961728452596140
     second: Base|WarehouseWobble
+  - first:
+      74: -6266152643596575308
+    second: ClockArmature|Clocktower_Clock
+  - first:
+      74: -5290324380776711979
+    second: ClockArmature|ClockTowerWobble
+  - first:
+      74: -8051009358614164075
+    second: ClockArmature|FortressArmatureAction
+  - first:
+      74: 2098025652158952040
+    second: ClockArmature|WarehouseWobble
+  - first:
+      74: -446099940694122807
+    second: ClockArmature.001|Clocktower_Clock
+  - first:
+      74: -431099011753926140
+    second: ClockArmature.001|ClockTowerWobble
+  - first:
+      74: 2055350597662244084
+    second: ClockArmature.001|FortressArmatureAction
+  - first:
+      74: -4835176548329961028
+    second: ClockArmature.001|WarehouseWobble
+  - first:
+      74: -2636405330006994960
+    second: ClockArmature.002|Clocktower_Clock
+  - first:
+      74: -8538657531015780855
+    second: ClockArmature.002|ClockTowerWobble
+  - first:
+      74: -9095765043870021321
+    second: ClockArmature.002|FortressArmatureAction
+  - first:
+      74: 4211608559537747996
+    second: ClockArmature.002|WarehouseWobble
+  - first:
+      74: 8410693304786029424
+    second: ClockArmature.003|Clocktower_Clock
+  - first:
+      74: -930041646226147278
+    second: ClockArmature.003|ClockTowerWobble
+  - first:
+      74: -681018982001852993
+    second: ClockArmature.003|FortressArmatureAction
+  - first:
+      74: 1543962220796294333
+    second: ClockArmature.003|WarehouseWobble
+  - first:
+      74: 8278624626557962451
+    second: ClockBase|ClockTowerWobble
+  - first:
+      74: 2397557278115950796
+    second: ClockBase|FortressArmatureAction
+  - first:
+      74: -7302869914392887171
+    second: ClockBase|WarehouseWobble
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -73,7 +130,36 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: ClockBase|ClockTowerWobble
+      takeName: ClockBase|ClockTowerWobble
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 400
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -130,7 +216,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.001
+    globalScale: 0.1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
