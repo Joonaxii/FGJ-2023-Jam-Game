@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public enum Menus
 {
@@ -124,6 +125,7 @@ public class MainMenu : MonoBehaviour
     void Update()
     {
         if (!_canMove) return;
+        var Inputs = GameManager.Instance.Inputs;
 
         if (_pressed != 0)
         {
@@ -135,29 +137,29 @@ public class MainMenu : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Inputs.IsDown(InputHandler.InputType.Confirm))
         {
             SelectOption();
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Inputs.IsDown(InputHandler.InputType.MoveUp))
         {
             _pressed = -1;
             _moveTimer = initialMoveTime;
             ChangeOption(_pressed);
         }
-        if (Input.GetKeyUp(KeyCode.UpArrow))
+        if (Inputs.IsUp(InputHandler.InputType.MoveUp))
         {
             ResetMovement();
         }
 
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (Inputs.IsDown(InputHandler.InputType.MoveDown))
         {
             _pressed = 1;
             _moveTimer = initialMoveTime;
             ChangeOption(_pressed);
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow))
+        if (Inputs.IsUp(InputHandler.InputType.MoveDown))
         {
             ResetMovement();
         }
@@ -245,6 +247,7 @@ public class MainMenu : MonoBehaviour
 
     IEnumerator HackerTexts()
     {
+        RNG.SetSeed((int)DateTime.Now.ToBinary());
         List<WeightedType<string>> localTexts = new(flavourTexts);
         int numOfTexts = RNG.Range(minHackerTexts, maxHackerTexts+1);
         descriptionBox.text = "";

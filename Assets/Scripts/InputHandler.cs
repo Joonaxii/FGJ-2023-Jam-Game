@@ -24,19 +24,19 @@ public class InputHandler
     {
         Span<bool> states = stackalloc bool[_inputs.Length];
 
-        states[0] = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-        states[1] = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
-        states[2] = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
-        states[3] = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
+        states[(int)InputType.MoveLeft] = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        states[(int)InputType.MoveUp] = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
+        states[(int)InputType.MoveRight] = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+        states[(int)InputType.MoveDown] = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
 
-        states[4] = Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter);
-        states[5] = Input.GetKey(KeyCode.Escape);
+        states[(int)InputType.Confirm] = Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter);
+        states[(int)InputType.Cancel] = Input.GetKey(KeyCode.Escape);
+              
+        states[(int)InputType.Action] = Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.Return);
+        states[(int)InputType.RotateLeft] = Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow);
+        states[(int)InputType.RotateRight] = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightArrow);
 
-        states[6] = Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.Return);
-        states[7] = Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.LeftArrow);
-        states[8] = Input.GetKey(KeyCode.E) || Input.GetKey(KeyCode.RightArrow);
-
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < _inputs.Length; i++)
         {
             _inputs[i].Update(states[i]);
         }
@@ -54,8 +54,8 @@ public class InputHandler
 
         public void Update(bool state)
         {
-            up = (held | down) & !state;
-            down = !down & state;
+            up = held & !state;
+            down = state & !held;
             held = state;
         }
     }
