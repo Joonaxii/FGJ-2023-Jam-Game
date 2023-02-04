@@ -13,12 +13,14 @@ public class GameStats
     [SerializeField] private float _baseBitCapacity   = 64;
     [SerializeField] private float _baseScanInterval  = 180.0f;
 
+    [SerializeField] private int _maxLives  = 3;
+
     private float _bits;
     private float _bitsPerSecond;
     private float _bitCapacity;
     private float _cpuPower;
     private float _scanTimer;
-
+    private int _lives;
 
     public void Reset()
     {
@@ -26,6 +28,7 @@ public class GameStats
         _bitsPerSecond = _baseBitsPerSecond;
         _bitCapacity = _baseBitCapacity;
         _cpuPower = _baseCPUPower;
+        _lives = _maxLives;
     }
 
     public void ResetScanTimer()
@@ -35,6 +38,13 @@ public class GameStats
 
     public int GetBits() => Mathf.FloorToInt(_bits);
     public bool HasEnoughBits(int bits) => bits <= GetBits();
+
+    public bool TakeDamage()
+    {
+        if(_maxLives <= 0) { return true; }
+        _maxLives--;
+        return _maxLives <= 0;
+    }
 
     public bool UseBits(int bits)
     {

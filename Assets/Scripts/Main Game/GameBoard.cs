@@ -48,12 +48,12 @@ public class GameBoard
         public TileFlags flags;
 
         public Vector3 worldPos;
-
         public Color currentColor;
 
         public Unit unit;
 
         public bool IsHacked() => (flags & (TileFlags.PermaHack | TileFlags.Hacked)) != 0;
+        public bool IsBeingScanned() => (flags & TileFlags.BeingScanned) != 0;
     }
 
     [ColorUsage(true, true)] public Color hackedColor = Color.red;
@@ -89,6 +89,10 @@ public class GameBoard
         }
     }
 
+    public ref BoardTile this[int i]
+    {
+        get => ref _board[i];
+    }
     public bool IsInBounds(Vector2Int point) { return point.x >= 0 && point.x < _width && point.y >= 0 && point.y < _height; }
 
     public Color TileToColor(ref BoardTile tile)

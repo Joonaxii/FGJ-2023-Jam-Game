@@ -49,4 +49,10 @@ public class Player
 
         return 0;
     }
+
+
+    public void Update(float delta)
+    {
+
+    }
 }

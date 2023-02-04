@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Windows;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class GameManager : MonoBehaviour
     public CameraController CameraController => _cameraCtrl;
     public Player Player => _player;
     public GameBoard Board => _board;
+    public InputHandler Inputs => _inputs;
 
     public GameStats GetStats => _stats;
 
@@ -17,6 +20,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameBoard _board;
 
     [SerializeField] private CameraController _cameraCtrl;
+
+    private InputHandler _inputs;
+
+    [SerializeField] private bool _autoStart;
 
     private bool _gameStarted;
     private bool _scanInProgress;
@@ -29,6 +36,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        _inputs = new InputHandler();
         Instance = this;
         DontDestroyOnLoad(gameObject);
         BorderlessWindow.InitializeOnLoad();
@@ -39,7 +47,12 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
-        StartGame();
+#if UNITY_EDITOR
+        if (_autoStart)
+        {
+            StartGame();
+        }
+#endif
     }
 
     public void MinimizeWindow() => BorderlessWindow.MinimizeWindow();
@@ -54,11 +67,14 @@ public class GameManager : MonoBehaviour
 
         _gameStarted = true;
         _cameraCtrl.SetPosition(Vector3.zero, true);
+        _cameraCtrl.SetNearFarBlend(0, false);
     }
 
     public void Update()
     {
         GTime.Tick(Time.deltaTime);
+
+        _inputs.Update();
 
         if (_gameStarted)
         {
@@ -87,6 +103,11 @@ public class GameManager : MonoBehaviour
 
         _scan = ScanSequence();
         StartCoroutine(_scan);
+    }
+
+    public void TriggerDetection()
+    {
+
     }
 
     private IEnumerator _scan;
