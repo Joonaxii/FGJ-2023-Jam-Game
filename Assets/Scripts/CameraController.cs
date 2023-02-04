@@ -1,6 +1,5 @@
 ﻿using TMPro;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 [System.Serializable]
 public class CameraController

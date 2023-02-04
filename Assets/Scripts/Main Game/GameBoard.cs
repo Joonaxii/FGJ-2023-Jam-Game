@@ -65,6 +65,8 @@ public class GameBoard
 
     public float scanSweep = 0.5f;
 
+    public Material materialGrid;
+
     private BoardTile[] _board;
 
     private Transform _gridRoot;
@@ -150,6 +152,7 @@ public class GameBoard
 
                 _glowRends[ind] = new GameObject($"Glow #{ind}").AddComponent<SpriteRenderer>();
                 var trGlow = _glowRends[ind].transform;
+                _glowRends[ind].sharedMaterial = materialGrid;
                 _glowRends[ind].sprite = gridGlow;
                 _glowRends[ind].color = tile.currentColor = TileToColor(ref tile);
                 trGlow.SetParent(_gridRoot);
