@@ -6,7 +6,6 @@ public class Player
     private Vector2Int _gridPosition;
     private List<Vector2Int> _path = new List<Vector2Int>();
 
-
     public int IndexOfPointOnPath(Vector2Int point)
     {
         for (int i = 0; i < _path.Count - 1; i++)
@@ -19,24 +18,27 @@ public class Player
         return -1;
     }
 
-    public bool AttemptMove(GameBoard gameBoard, Vector2Int direction)
+    public int AttemptMove(GameBoard gameBoard, Vector2Int direction, out Vector2Int curPos, out Vector2Int newPos)
     {
-        Vector2Int nextPos = _gridPosition + direction;
-        if (!gameBoard.IsInBounds(nextPos)) { return false;  }
+        newPos = _gridPosition + direction;
+        curPos = _gridPosition;
+        if (!gameBoard.IsInBounds(newPos)) { return 0;  }
 
         if (_path.Count > 0)
         {
-            if (_path[_path.Count-1] == nextPos)
+            if (_path[_path.Count - 1] == newPos)
             {
-                _path.RemoveAt(_path.Count-1);
-                _gridPosition = nextPos;
-                return true;
+                return 2;
             }
         }
-        int index = IndexOfPointOnPath(nextPos);
+        int index = IndexOfPointOnPath(newPos);
+        return index < 0 ? 0 : 1;
+    }
 
-        if (index < 0) { return false; }
-        _gridPosition = nextPos;
-        return true;
+    public int MakeMove(GameBoard gameBoard, Vector2Int nextPos)
+    {
+        return 0;
+
+
     }
 }

@@ -70,7 +70,7 @@ public class GameBoard : MonoBehaviour
         }
     }
 
-    public bool IsInBounds(Vector2Int point) { return point.x >= 0 &&  }
+    public bool IsInBounds(Vector2Int point) { return point.x >= 0 && point.x < _width && point.y >= 0 && point.y < _height; }
 
     public void Generate(int width, int height)
     {
@@ -125,6 +125,16 @@ public class GameBoard : MonoBehaviour
             }
             baseY += 1.0f + PADDING;
         }
+    }
+
+    public int GetGridPointMoveCost(Vector2Int pos)
+    {
+        int ind = pos.y * _width + pos.x;
+        if (ind < 0 || ind >= _board.Length) { return 0; }
+
+        ref var tile = ref _board[ind];
+        if ((tile.flags & (GameBoard.TileFlags.PermaHack | GameBoard.TileFlags.Hacked)) != 0) { return 0; }
+        return Mathf.FloorToInt(GameBoard.TileTypeToBitCost(tile.type));
     }
 
     public void RefreshStats(out float addBPS, out float addBCap, out float speedMod)
