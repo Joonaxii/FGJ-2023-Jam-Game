@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.UI;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.EventSystems;
 
 public enum Menus
 {
@@ -31,6 +34,11 @@ public class MainMenu : MonoBehaviour
     public Menus curMenu = Menus.Main;
     public int curOption = 0;
     public int currentPage;
+
+    public Image windowMax;
+    public Sprite[] windowResizeSprites;
+
+    public CanvasGroup menuCanvas;
 
     public float initialMoveTime = 0.5f;
     public float moveTime = 0.1f;
@@ -117,6 +125,24 @@ public class MainMenu : MonoBehaviour
         _hackTextTimer = 0;
         _canMove = true;
         mainText.text = string.Format(_mainText, _mainMenuText[0]);
+        curOption = 0;
+        SetHighlight(mainMenuOptions[curOption].buttonText);
+
+        windowMax.sprite = windowResizeSprites[GameManager.IsMaximized ? 1 : 0];
+    }
+
+    public void ToggleWindowSize()
+    {
+        GameManager.Instance.ToggleWindowSize();
+        windowMax.sprite = windowResizeSprites[GameManager.IsMaximized ? 1 : 0];
+    }
+
+    public void OpenMainMenu()
+    {
+        menuCanvas.alpha = 1.0f;
+        descriptionBox.enabled = false;
+        _hackTextTimer = 0;
+        _canMove = true;
         curOption = 0;
         SetHighlight(mainMenuOptions[curOption].buttonText);
     }
@@ -266,6 +292,21 @@ public class MainMenu : MonoBehaviour
             yield return new WaitForSeconds(_hackTextTimer);
         }
         descriptionBox.text += "<color=#FFFF33><b>You are in.</color></b>";
-        yield return null;
+
+        GameManager.Instance.InitGame();
+        float fadeDuration = 1.5f;
+        float fadeTime = 0;
+
+        yield return new WaitForSeconds(1.0f);
+        while (fadeTime < fadeDuration)
+        {
+            float n = fadeTime / fadeDuration;
+            menuCanvas.alpha = 1.0f - n;
+
+            fadeTime += GTime.GetDeltaTime(0);
+            yield return null;
+        }
+        menuCanvas.alpha = 0;
+        yield return StartCoroutine(GameManager.Instance.StartGame());
     }
 }

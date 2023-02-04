@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Windows;
 
 public class GameManager : MonoBehaviour
 {
+    public static bool IsMaximized => !Instance._maximize;
+
     public static GameManager Instance { get; private set; }
 
     public CameraController CameraController => _cameraCtrl;
@@ -20,19 +23,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameBoard _board;
 
     [SerializeField] private CameraController _cameraCtrl;
+    [SerializeField] private AnimationCurve _cameraMoveCurve;
 
     private InputHandler _inputs;
-
-    [SerializeField] private bool _autoStart;
 
     private LineRenderer _path;
 
     private bool _gameStarted;
     private bool _scanInProgress;
 
+    private bool _maximize = true;
+
     private void Awake()
     {
-        if(Instance != null && Instance != this)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
@@ -42,26 +46,50 @@ public class GameManager : MonoBehaviour
         _path = transform.Find("Path").GetComponent<LineRenderer>();
         Instance = this;
         DontDestroyOnLoad(gameObject);
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
         BorderlessWindow.InitializeOnLoad();
+        BorderlessWindow.RestoreWindow();
+#endif
         GTime.Init();
 
         _player = new Player();
     }
 
-    public void Start()
+    public void MinimizeWindow()
     {
-#if UNITY_EDITOR
-        if (_autoStart)
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+        BorderlessWindow.MinimizeWindow();
+#endif
+    }
+    public void MaximizeWindow()
+    {
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+        BorderlessWindow.MaximizeWindow();
+#endif
+    }
+    public void RestoreWindow()
+    {
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+        BorderlessWindow.RestoreWindow();
+#endif
+    }
+
+    public void ToggleWindowSize()
+    {
+        _maximize = !_maximize;
+#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+        if(_maximize)
         {
-            StartGame();
+            BorderlessWindow.RestoreWindow();
+        }
+        else
+        {
+            BorderlessWindow.MaximizeWindow();
         }
 #endif
     }
 
-    public void MinimizeWindow() => BorderlessWindow.MinimizeWindow();
-    public void MaximizeWindow() => BorderlessWindow.MaximizeWindow();
-
-    public void StartGame()
+    public void InitGame()
     {
         _path.positionCount = 0;
 
@@ -69,15 +97,31 @@ public class GameManager : MonoBehaviour
         _stats.Reset();
 
         _board.Generate(31, 31);
-
-        _gameStarted = true;
-
         _player.ResetPlayer(_board);
 
         _cameraCtrl.SetPosition(Vector3.zero, true);
-        _cameraCtrl.SetNearFarBlend(0, false);
+        _cameraCtrl.SetNearFarBlend(1.0f, true);
 
         UpdatePath();
+    }
+
+    public IEnumerator StartGame()
+    {
+        float fadeDur = 1.0f;
+        _cameraCtrl.SetNearFarBlend(1.0f, true);
+
+        yield return new WaitForSeconds(1.0f);
+
+        float t = 0;
+        while (t < fadeDur)
+        {
+            _cameraCtrl.SetNearFarBlend(1.0f - _cameraMoveCurve.Evaluate(t / fadeDur), true);
+            t += GTime.GetDeltaTime(0);
+            yield return null;
+        }
+
+        _cameraCtrl.SetNearFarBlend(0, true);
+        _gameStarted = true;
     }
 
     public void UpdatePath()
@@ -101,6 +145,8 @@ public class GameManager : MonoBehaviour
             _path.SetPositions(positions);
         }
     }
+
+    public void QuitGame() => Application.Quit();
 
     public void Update()
     {
@@ -147,10 +193,21 @@ public class GameManager : MonoBehaviour
     private IEnumerator _scan;
     private IEnumerator ScanSequence()
     {
+        float fadeDur = 1.5f;
+        float t = 0;
+        while (t < fadeDur)
+        {
+            _cameraCtrl.SetNearFarBlend(_cameraMoveCurve.Evaluate(t / fadeDur), true);
+            t += GTime.GetDeltaTime(0);
+            yield return null;
+        }
+
+        _cameraCtrl.SetNearFarBlend(1.0f, true);
+
         int width = _board.Width;
         for (int i = 0; i < width; i++)
         {
-            if(i == width - 1)
+            if (i == width - 1)
             {
                 yield return _board.BeginScan(i);
             }
@@ -161,5 +218,16 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
         _scanInProgress = false;
+
+        fadeDur = 1.5f;
+        t = 0;
+        while (t < fadeDur)
+        {
+            _cameraCtrl.SetNearFarBlend(1.0f - _cameraMoveCurve.Evaluate(t / fadeDur), true);
+            t += GTime.GetDeltaTime(0);
+            yield return null;
+        }
+
+        _cameraCtrl.SetNearFarBlend(0.0f, true);
     }
 }
