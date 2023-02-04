@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Clock_Face_4
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Circuit_Body.007
+    m_Weight: 0
+  - m_Path: Circuit_Body.008
+    m_Weight: 0
+  - m_Path: Circuit_Body.009
+    m_Weight: 0
+  - m_Path: Circuit_Body.010
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.001
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.002
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.003
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.004
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.005
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.006
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.007
+    m_Weight: 0
+  - m_Path: Circuit_Leg_Straight.008
+    m_Weight: 0
+  - m_Path: ClockArmature
+    m_Weight: 0
+  - m_Path: ClockArmature/Root
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/A
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/B
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/C
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/D
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/E
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/F
+    m_Weight: 0
+  - m_Path: ClockArmature/Root/G
+    m_Weight: 0
+  - m_Path: ClockArmature.001
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/A
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/B
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/C
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/D
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/E
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/F
+    m_Weight: 0
+  - m_Path: ClockArmature.001/Root/G
+    m_Weight: 0
+  - m_Path: ClockArmature.002
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/A
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/B
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/C
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/D
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/E
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/F
+    m_Weight: 0
+  - m_Path: ClockArmature.002/Root/G
+    m_Weight: 0
+  - m_Path: ClockArmature.003
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/A
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/B
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/C
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/D
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/E
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/F
+    m_Weight: 1
+  - m_Path: ClockArmature.003/Root/G
+    m_Weight: 1
+  - m_Path: LED.001
+    m_Weight: 0
+  - m_Path: LED.002
+    m_Weight: 0
+  - m_Path: LED.003
+    m_Weight: 0
+  - m_Path: LED.004
+    m_Weight: 0

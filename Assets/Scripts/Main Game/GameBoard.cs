@@ -22,6 +22,7 @@ public class GameBoard
         Hacked      = 0x01,
 
         Overclocked = 0x2,
+        BeingScanned = 0x4,
 
         PermaHack   = 0x80,
     }               
@@ -49,6 +50,8 @@ public class GameBoard
         public Vector3 worldPos;
 
         public Color currentColor;
+
+        public Unit unit;
 
         public bool IsHacked() => (flags & (TileFlags.PermaHack | TileFlags.Hacked)) != 0;
     }
@@ -217,6 +220,8 @@ public class GameBoard
         return vec;
     }
 
+
+
     private IEnumerator BeginScanColumn(int column)
     {
         Color[] scanBuf = new Color[_height];
@@ -287,7 +292,6 @@ public class GameBoard
         }
         EndScan(column);
     }
-
     private IEnumerator EndScanColumn(int column)
     {
         Color[] scanBuf = new Color[_height];
