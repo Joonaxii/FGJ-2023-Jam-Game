@@ -755,7 +755,7 @@ GameObject:
   - component: {fileID: 908378643}
   - component: {fileID: 908378642}
   m_Layer: 5
-  m_Name: Play
+  m_Name: Run
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -801,7 +801,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Play
+  m_text: Run
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e56467f271bbc4b418d2f1d0677b8be1, type: 2}
   m_sharedMaterial: {fileID: -4639276077216573694, guid: e56467f271bbc4b418d2f1d0677b8be1, type: 2}
@@ -1150,7 +1150,7 @@ MonoBehaviour:
   m_text: 'Macrohard Walls [Version 64.5177.34.77395.7675863.51]
 
     (c) Macrohard
-    Freelancing. All right are not reserved.
+    Freelancing. All rights are not reserved.
 
 
     C:\\Users\\INTO_THE_ROOT>'
@@ -1549,6 +1549,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be6e5c9cbc276154697b43aebd86b0ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  options:
+  - {fileID: 908378642}
+  - {fileID: 1154468929}
+  - {fileID: 807588259}
+  mainText: {fileID: 1161007341}
+  curOption: 0
+  currentPage: 0
+  initialMoveTime: 0.5
+  moveTime: 0.1
+  highlightColor: {r: 1, g: 1, b: 0.20000002, a: 1}
 --- !u!1 &1664809716
 GameObject:
   m_ObjectHideFlags: 0
