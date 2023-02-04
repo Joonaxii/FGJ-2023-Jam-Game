@@ -213,6 +213,7 @@ public class MainMenu : MonoBehaviour
         {
             case Menus.Main:
                 // TODO: Open main menu and enable main menu options
+                OpenMenu(Menus.Main);
                 break;
             case Menus.Run:
                 _canMove = false;
