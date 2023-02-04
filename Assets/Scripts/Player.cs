@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Player
 {
+    public Vector2Int Coord => _gridPosition;
+
     private Vector2Int _gridPosition;
     private List<Vector2Int> _path = new List<Vector2Int>();
 
@@ -33,6 +35,12 @@ public class Player
         }
         int index = IndexOfPointOnPath(newPos);
         return index < 0 ? 0 : 1;
+    }
+
+    public void SetPosition(GameBoard gameBoard)
+    {
+        _path.Clear();
+        _gridPosition= new Vector2Int(gameBoard.Width >> 1, gameBoard.Height >> 1);
     }
 
     public int MakeMove(GameBoard gameBoard, Vector2Int nextPos)

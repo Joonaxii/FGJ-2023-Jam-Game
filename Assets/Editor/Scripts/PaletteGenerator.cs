@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class PaletteGenerator : EditorWindow

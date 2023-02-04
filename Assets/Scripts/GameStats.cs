@@ -12,13 +12,13 @@ public class GameStats
     [SerializeField] private float _startingBits      = 32;
     [SerializeField] private float _baseBitCapacity   = 64;
     [SerializeField] private float _baseScanInterval  = 180.0f;
-    [SerializeField] private float _baseScanDuration  = 20.0f;
 
     private float _bits;
     private float _bitsPerSecond;
     private float _bitCapacity;
     private float _cpuPower;
     private float _scanTimer;
+
 
     public void Reset()
     {
@@ -56,5 +56,16 @@ public class GameStats
     {
         _bits += delta * _bitsPerSecond;
         _bits = Mathf.Clamp(_bits, 0, _bitCapacity);
+    }
+
+    public bool UpdateScan(float delta)
+    {
+        _scanTimer += delta;
+        if(_scanTimer >= _baseScanInterval)
+        {
+            _scanTimer = 0;
+            return true;
+        }
+        return false;
     }
 }
