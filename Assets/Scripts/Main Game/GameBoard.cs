@@ -10,7 +10,7 @@ using Debug = UnityEngine.Debug;
 [System.Serializable]
 public class GameBoard
 {
-    private const float PADDING = 0.125f;
+    private const float PADDING = 0.5f;
 
     public int Width => _width;
     public int Height => _height;
@@ -114,9 +114,9 @@ public class GameBoard
         _height = Mathf.Clamp(height, 1, 255);
 
         _width  += (_width  & 0x1) == 0 ? 1 : 0;
-        _height += (_width & 0x1) == 0 ? 1 : 0;
+        _height += (_height & 0x1) == 0 ? 1 : 0; 
 
-        int center = (_height >> 1) * _width + _width >> 1;
+        int center = (_height >> 1) * _width + (_width >> 1);
         _board = new BoardTile[_width * _height];
 
         _scans = new IEnumerator[_width];
@@ -126,9 +126,9 @@ public class GameBoard
         mainTile.type = TileType.MainBase;
         mainTile.flags = TileFlags.PermaHack;
 
-        float wSize = (_width  * 0.5f + PADDING * 0.5f);
-        float hSize = (_height * 0.5f + PADDING * 0.5f);
-
+        float wSize = (((_width  -1.0f)  * (1.0f + (PADDING * 1f))) * 0.5f) + 0.5f;
+        float hSize = (((_height  -1.0f) * (1.0f + (PADDING * 1f))) * 0.5f) + 0.5f;
+         
         _glowRends = new SpriteRenderer[_board.Length];
 
         float baseY = -hSize;
@@ -147,7 +147,7 @@ public class GameBoard
                 _glowRends[ind].color = tile.currentColor = TileToColor(ref tile);
                 trGlow.SetParent(_gridRoot);
 
-                tile.worldPos = new Vector3(baseX - 0.5f, 0, baseY - 0.5f);
+                tile.worldPos = new Vector3(baseX + 0.5f, 0, baseY + 0.5f);
                 trGlow.eulerAngles = new Vector3(-90, 0, 0);
                 trGlow.position = tile.worldPos;
 
@@ -212,8 +212,8 @@ public class GameBoard
     public Vector3 GridToWorld(Vector2Int coord)
     {
         Vector3 vec = default;
-        vec.x = _width * -0.5f + coord.x + coord.x * PADDING - 0.5f;
-        vec.y = _height * -0.5f + coord.y + coord.y * PADDING - 0.5f;
+        vec.x = _width * PADDING * -0.5f + coord.x + coord.x * PADDING - 0.5f;
+        vec.y = _height * PADDING * -0.5f + coord.y + coord.y * PADDING - 0.5f;
         return vec;
     }
 

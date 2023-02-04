@@ -78,6 +78,9 @@ ModelImporter:
   - first:
       74: 2477066507844262710
     second: Armature|Inductor.003Action
+  - first:
+      74: 5889411673028429991
+    second: FactoryArmature|FactoryPuksutus
   externalObjects: {}
   materials:
     materialImportMode: 2
@@ -108,8 +111,8 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature|ArmatureAction
-      takeName: Armature|ArmatureAction
+      name: FactoryArmature|FactoryPuksutus
+      takeName: FactoryArmature|FactoryPuksutus
       internalID: 0
       firstFrame: 0
       lastFrame: 60
@@ -192,7 +195,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 0.001
+    globalScale: 0.1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
