@@ -218,13 +218,9 @@ public class GameBoard
 
     public Vector3 GridToWorld(Vector2Int coord)
     {
-        Vector3 vec = default;
-        vec.x = _width * PADDING * -0.5f + coord.x + coord.x * PADDING - 0.5f;
-        vec.y = _height * PADDING * -0.5f + coord.y + coord.y * PADDING - 0.5f;
-        return vec;
+        int ind = coord.y * _width + coord.x;
+        return ind < 0 || ind >= _board.Length ? default : _board[ind].worldPos;
     }
-
-
 
     private IEnumerator BeginScanColumn(int column)
     {
