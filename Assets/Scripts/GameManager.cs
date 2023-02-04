@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private bool _autoStart;
 
+    private LineRenderer _path;
+
     private bool _gameStarted;
     private bool _scanInProgress;
 
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
         }
 
         _inputs = new InputHandler();
+        _path = transform.Find("Path").GetComponent<LineRenderer>();
         Instance = this;
         DontDestroyOnLoad(gameObject);
         BorderlessWindow.InitializeOnLoad();
@@ -60,14 +63,43 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        _path.positionCount = 0;
+
         GTime.Reset();
         _stats.Reset();
 
         _board.Generate(31, 31);
 
         _gameStarted = true;
+
+        _player.ResetPlayer(_board);
+
         _cameraCtrl.SetPosition(Vector3.zero, true);
         _cameraCtrl.SetNearFarBlend(0, false);
+
+        UpdatePath();
+    }
+
+    public void UpdatePath()
+    {
+        _path.positionCount = 0;
+
+        var path = _player.GetPath;
+        if (path.Count > 0)
+        {
+
+            Vector3[] positions = new Vector3[path.Count + 1];
+            positions[path.Count] = _board.GridToWorld(_player.Coord);
+            positions[path.Count].y = 0.1f;
+
+            for (int i = 0; i < path.Count; i++)
+            {
+                positions[i] = _board.GridToWorld(path[i]);
+                positions[i].y = 0.1f;
+            }
+            _path.positionCount = path.Count + 1;
+            _path.SetPositions(positions);
+        }
     }
 
     public void Update()
@@ -89,6 +121,8 @@ public class GameManager : MonoBehaviour
                     StartScan();
                 }
             }
+
+            _player.Update(delta);
         }
     }
 
