@@ -67,6 +67,7 @@ public class MainMenu : MonoBehaviour
         new ("Hitting a breakpoint...",8),
         new ("Starting VPN (Connecting to GB)...",8),
         new ("Mining data...",8),
+        new ("Spreading misinformation...",8),
         new ("Downloading more RAM...",6),
         new ("Enabling tracking...",6),
         new ("Embedding link (<color=#ffff33>https://www.youtube.com/watch?v=dQw4w9WgXcQ</color>)...",6),

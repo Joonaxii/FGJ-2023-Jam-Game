@@ -11,11 +11,13 @@ public class MazePlayerController : MonoBehaviour
     public float maxVelocity;
 
     private Rigidbody2D _rb2D;
+    private MazeMinigame _mazeManager;
 
     // Start is called before the first frame update
     void Start()
     {
         _rb2D = GetComponent<Rigidbody2D>();
+        _mazeManager = GetComponentInParent<MazeMinigame>();
     }
 
     // Update is called once per frame
@@ -23,16 +25,16 @@ public class MazePlayerController : MonoBehaviour
     {
         var Inputs = GameManager.Instance.Inputs;
 
-        if (Inputs.IsHeld(InputHandler.InputType.RotateLeft))
+        if (Inputs.IsHeld(InputHandler.InputType.RotateLeft) && _mazeManager.isActive)
         {
-            _rb2D.rotation += turnSpeed * Time.deltaTime;
+            _rb2D.rotation += turnSpeed * GTime.GetDeltaTime(0);
         }
-        if (Inputs.IsHeld(InputHandler.InputType.RotateRight))
+        if (Inputs.IsHeld(InputHandler.InputType.RotateRight) && _mazeManager.isActive)
         {
-            _rb2D.rotation += -turnSpeed * Time.deltaTime;
+            _rb2D.rotation += -turnSpeed * GTime.GetDeltaTime(0);
         }
 
-        if (Inputs.IsHeld(InputHandler.InputType.MoveUp))
+        if (Inputs.IsHeld(InputHandler.InputType.MoveUp) && _mazeManager.isActive)
         {
             _rb2D.AddForce(transform.up * acceleration);
             var vel = _rb2D.velocity;
