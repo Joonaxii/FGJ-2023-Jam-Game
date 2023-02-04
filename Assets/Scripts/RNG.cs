@@ -36,11 +36,11 @@ public static class RNG
         return w;
     }
 
-    public static T SelectRandom<T>(IList<WeightedType<T>> values, T defaultValue) => SelectRandom(values, values.Count, GetTotalWeight(values), defaultValue);
-    public static T SelectRandom<T>(IList<WeightedType<T>> values, int count, T defaultValue) => SelectRandom(values, count, GetTotalWeight(values), defaultValue);
+    public static T SelectRandom<T>(IList<WeightedType<T>> values, T defaultValue = default(T)) => SelectRandom(values, values.Count, GetTotalWeight(values), defaultValue);
+    public static T SelectRandom<T>(IList<WeightedType<T>> values, int count, T defaultValue = default(T)) => SelectRandom(values, count, GetTotalWeight(values), defaultValue);
 
-    public static T SelectRandom<T>(IList<WeightedType<T>> values, float totalWeight, T defaultValue) => SelectRandom(values, values.Count, totalWeight, defaultValue);
-    public static T SelectRandom<T>(IList<WeightedType<T>> values, int count, float totalWeight, T defaultValue) 
+    public static T SelectRandom<T>(IList<WeightedType<T>> values, float totalWeight, T defaultValue = default(T)) => SelectRandom(values, values.Count, totalWeight, defaultValue);
+    public static T SelectRandom<T>(IList<WeightedType<T>> values, int count, float totalWeight, T defaultValue = default(T)) 
     {
         var ind = SelectRandomIndex(values, count, totalWeight);
         return ind < 0 ? defaultValue : values[ind].value;

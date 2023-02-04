@@ -37,8 +37,8 @@ public class Player
 
     public int MakeMove(GameBoard gameBoard, Vector2Int nextPos)
     {
+
+
         return 0;
-
-
     }
 }
