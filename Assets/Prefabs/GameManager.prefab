@@ -220,11 +220,11 @@ MonoBehaviour:
     hackingWindow: {fileID: 935161874875360698}
     anim: {fileID: 935161874875360689}
     hackingMinigames:
-    - weight: 5.5
+    - weight: 6.5
       value: {fileID: 8809370343289720511}
     - weight: 2.5
       value: {fileID: 8809370344503265461}
-    - weight: 4
+    - weight: 2.5
       value: {fileID: 8310457228032213391}
   _mainMenu: {fileID: 423326656296449338}
   _audioManager:
