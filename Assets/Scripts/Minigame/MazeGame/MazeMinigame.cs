@@ -16,22 +16,14 @@ public class MazeMinigame : HackingBase
 
     public bool isActive;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // Call this later from game manager when entering a building
-        Initialize();
-    }
-
-    public override void Cancel()
-    {
-        throw new System.NotImplementedException();
-    }
-    public override void Finish()
+    public void CleanUp()
     {
         isActive = false;
-        Debug.Log("Maze Finish!");
+        Destroy(_player);
     }
+
+    public override void Cancel() => CleanUp();
+    public override void Finish() => CleanUp();
     public override void Initialize()
     {
         List<Transform> temp = new (spawnSpots);
