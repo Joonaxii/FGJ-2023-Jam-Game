@@ -1156,12 +1156,13 @@ MonoBehaviour:
   - {fileID: 179681686}
   - {fileID: 1672001258}
   - {fileID: 116361899}
-  arrowDefault: {r: 0.52156866, g: 0.5568628, b: 0.57254905, a: 0}
-  arrowHighlight: {r: 1, g: 1, b: 0.20000002, a: 0}
-  lightDefault: {r: 0.13725491, g: 0.16470589, b: 0.20784315, a: 0}
-  lightHighlight: {r: 1, g: 1, b: 0.20000002, a: 0}
-  timeBetweenFlashes: 0
-  flashTime: 0
+  arrowDefault: {r: 0.52156866, g: 0.5568628, b: 0.57254905, a: 1}
+  arrowHighlight: {r: 1, g: 1, b: 0.20000002, a: 1}
+  arrowPlayer: {r: 1, g: 0.25882354, b: 0.81568635, a: 1}
+  lightDefault: {r: 0.13725491, g: 0.16470589, b: 0.20784315, a: 1}
+  lightHighlight: {r: 1, g: 1, b: 0.20000002, a: 1}
+  timeBetweenFlashes: 0.15
+  flashTime: 0.5
 --- !u!1 &1272525590
 GameObject:
   m_ObjectHideFlags: 0
