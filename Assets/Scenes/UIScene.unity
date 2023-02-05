@@ -1118,7 +1118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1202931704
 Transform:
   m_ObjectHideFlags: 0
@@ -1153,8 +1153,8 @@ MonoBehaviour:
   - {fileID: 517255860}
   - {fileID: 335071434}
   lights:
-  - {fileID: 179681686}
   - {fileID: 1672001258}
+  - {fileID: 179681686}
   - {fileID: 116361899}
   arrowDefault: {r: 0.52156866, g: 0.5568628, b: 0.57254905, a: 1}
   arrowHighlight: {r: 1, g: 1, b: 0.20000002, a: 1}
