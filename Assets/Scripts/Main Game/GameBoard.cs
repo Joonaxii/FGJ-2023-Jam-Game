@@ -1,6 +1,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Debug = UnityEngine.Debug;
@@ -74,6 +75,8 @@ public class GameBoard
 
     public Unit[] units;
 
+    public WorldText[] texts;
+
     private BoardTile[] _board;
 
     private Transform _gridRoot;
@@ -122,9 +125,10 @@ public class GameBoard
         tile.flags |= TileFlags.BeingScanned;
         int? ret = tile.unit?.ScanUnit();
 
-        switch (ret.GetValueOrDefault())
+        if(tile.gridPos == GameManager.Instance.Player.Coord && GameManager.Instance.Hacking.IsHacking)
         {
-
+            GameManager.Instance.Hacking.CancelHack();
+            GameManager.Instance.GetStats.TakeDamage();
         }
     }
 
@@ -173,6 +177,70 @@ public class GameBoard
             _glowRends[id].color = tile.currentColor;
         }
 
+    }
+
+    public void ShowMessages(Vector2Int around)
+    {
+        int txt = 0;
+
+        ref var tileCur = ref this[around];
+        var plr = GameManager.Instance.Player;
+        var path = plr.GetPath;
+
+        bool locked = !tileCur.IsHacked() && tileCur.type != TileType.Empty;
+        for (int y = -1; y <= 1; y++)
+        {
+            for (int x = -1; x <= 1; x++)
+            {
+                if(y == 0 && x == 0) { continue; }
+
+                Vector2Int pos = new Vector2Int(around.x + x,  around.y + y);
+                bool inBounds = IsInBounds(pos);
+
+                if (inBounds)
+                {
+                    ref var tile = ref _board[pos.y * _width + pos.x];
+
+                    bool isPrev = path.Count > 0 && path[path.Count - 1] == pos;
+                    if (locked && !isPrev && path.Count > 0)
+                    {
+                        texts[txt++].Setup(Vector3.zero, false, "");
+                        continue;
+                    }
+
+                    if (isPrev)
+                    {
+                        texts[txt++].Setup(tile.worldPos, true, "<color=#00FF00>+1b</color>");
+                        continue;
+                    }
+
+                    if (tile.IsHacked())
+                    {
+                        if(tile.type == TileType.MainBase)
+                        {
+                            texts[txt++].Setup(Vector3.zero, false, "");
+                            continue;
+                        }
+                        texts[txt++].Setup(tile.worldPos, true, "<color=#00FFF0>0b</color>");
+                        continue;
+                    }
+
+
+                    int cost = GetGridPointMoveCost(ref tile) ;
+                    if(GameManager.Instance.GetStats.HasEnoughBits(cost + plr.AccumulatedCost))
+                    {
+                        texts[txt++].Setup(tile.worldPos, true, $"-{cost}b");
+                        continue;
+                    }
+                    texts[txt++].Setup(tile.worldPos, true, $"<color=#FF0000>-{cost}b</color>");
+                }
+                else
+                {
+                    texts[txt++].Setup(Vector3.zero, false, "");
+                }
+
+            }
+        }
     }
 
     public void OccupyTiles(Vector2Int start, int w, int h, TileType type, bool state)
@@ -232,6 +300,11 @@ public class GameBoard
 
     public void Generate(int width, int height)
     {
+        for (int i = 0; i < texts.Length; i++)
+        {
+            texts[i].Setup(Vector3.zero, false, "");
+        }
+
         if (_board != null)
         {
             foreach (var item in _board)

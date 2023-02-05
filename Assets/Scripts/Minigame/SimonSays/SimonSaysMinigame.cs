@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public enum Direction {
+public enum Direction
+{
     Left = 0,
     Up = 1,
     Right = 2,
@@ -78,9 +80,17 @@ public class SimonSaysMinigame : HackingBase
                 }
             }
             if (areIdentical)
+            {
+
                 StartCoroutine(SimonSays(false));
+            }
             else
-                Cancel();
+            {
+                GameManager.Instance.Hacking.CancelHack();
+            }
+        }else if(_playerInputs.Count > _simonInputs.Count)
+        {
+            GameManager.Instance.Hacking.CancelHack();
         }
     }
     private void PlayerInput(Direction dir)
@@ -139,6 +149,8 @@ public class SimonSaysMinigame : HackingBase
         _playerInputs.Clear();
         _simonInputs.Clear();
         _isPlayerTurn = false;
+        _isPressing = false;
+        _curRound = 0;
     }
     public override void Finish()
     {
@@ -146,9 +158,17 @@ public class SimonSaysMinigame : HackingBase
         _playerInputs.Clear();
         _simonInputs.Clear();
         _isPlayerTurn = false;
+        _isPressing = false;
+        _curRound = 0;
+        base.Finish();
     }
     public override void Initialize()
     {
+        _isPressing = false;
+        _curRound = 0;
+        _playerInputs.Clear();
+        _simonInputs.Clear();
+
         foreach (var arrow in arrows)
             arrow.color = arrowDefault;
         foreach (var light in lights)

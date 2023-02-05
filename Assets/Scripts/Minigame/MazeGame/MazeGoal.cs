@@ -17,7 +17,7 @@ public class MazeGoal : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             var ps = Instantiate(explEffect, transform.position, Quaternion.identity);
-            ps.gameObject.layer = LayerMask.GetMask("Hacking");
+            ps.gameObject.layer = LayerMask.NameToLayer("Hacking");
 
             transform.GetChild(0).gameObject.SetActive(false);
 

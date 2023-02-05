@@ -20,10 +20,15 @@ public class MazeMinigame : HackingBase
     {
         isActive = false;
         Destroy(_player);
+
+        if(_goal != null)
+        {
+            Destroy(_goal);
+        }
     }
 
     public override void Cancel() => CleanUp();
-    public override void Finish() => CleanUp();
+    public override void Finish() { CleanUp(); base.Finish();  }
     public override void Initialize()
     {
         List<Transform> temp = new (spawnSpots);

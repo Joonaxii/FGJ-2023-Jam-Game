@@ -67,7 +67,10 @@ public class Player
 
         if ((!hacked && curTile.type != GameBoard.TileType.Empty) || tile.type == GameBoard.TileType.MainBase) 
         { 
-            return 0; 
+            if(_path.Count > 0 || tile.type != GameBoard.TileType.Empty)
+            {
+                return 0;
+            }
         }
 
         int nextCost = cost + costT;
@@ -89,38 +92,36 @@ public class Player
         _plrVelo = Vector3.zero;
         playerTR.position = _plrPos = _plrTgt = gameBoard.GridToWorld(_gridPosition);
         GameManager.Instance.UpdatePath();
+        GameManager.Instance.Board.ShowMessages(_gridPosition);
     }
 
     public bool MakeMove(GameBoard gameBoard)
     {
-        if(_path.Count < 1) { return false; }
-
-        if(_accumulatedCost > 0)
-        {
-            GameManager.Instance.GetStats.UseBits(_accumulatedCost);
-            _accumulatedCost = 0;
-        }
-
         ref var tile = ref gameBoard[_gridPosition];
 
         bool beingScanned = tile.IsBeingScanned();
-    
-        if (!tile.IsHacked() && tile.type != GameBoard.TileType.Empty)
+        int cost = gameBoard.GetGridPointMoveCost(ref tile);
+        if (!tile.IsHacked() && tile.type != GameBoard.TileType.Empty && (_path.Count > 0 || GameManager.Instance.GetStats.HasEnoughBits(cost)))
         {
-            //TODO: Begin hacking game...
+            if(_path.Count < 1)
+            {
+                GameManager.Instance.GetStats.UseBits(cost);
+            }
 
-            if(tile.linkTile > -1)
+            if (tile.linkTile > -1)
             {
                 tile = ref gameBoard[tile.linkTile];
             }
 
-            if(tile.unit != null)
+            if (tile.unit != null)
             {
                 Vector2Int coord = tile.gridPos;
                 tile.unit.Access((int ret) =>
                 {
                     switch (ret)
                     {
+                        case 0:
+                            break;
                         case 1:
                             gameBoard.SetTileState(coord, true);
                             GameManager.Instance.GetStats.SetCorruption(gameBoard.GetCorruption());
@@ -129,9 +130,25 @@ public class Player
                 });
             }
         }
-        else if(!tile.IsHacked())
+        else if (!tile.IsHacked())
         {
             gameBoard.SetTileState(_gridPosition, true);
+        }
+
+
+        if (_path.Count < 1) 
+        {
+            if (beingScanned)
+            {
+                GameManager.Instance.GetStats.TakeDamage();
+            }
+            return false;
+        }
+
+        if(_accumulatedCost > 0)
+        {
+            GameManager.Instance.GetStats.UseBits(_accumulatedCost);
+            _accumulatedCost = 0;
         }
 
         foreach (var item in _path)
@@ -139,7 +156,7 @@ public class Player
             ref var tileC = ref gameBoard[item];
             beingScanned |= tileC.IsBeingScanned();
 
-            if (!tileC.IsHacked())
+            if (!tileC.IsHacked() && tileC.type == GameBoard.TileType.Empty)
             {
                 gameBoard.SetTileState(item, true);
 
@@ -155,6 +172,8 @@ public class Player
         var stats = GameManager.Instance.GetStats;
         GameManager.Instance.GameUI.UpdateBitAmount(stats.Bits, stats.BitCapacity, stats.BitsPerSecond, _accumulatedCost);
         GameManager.Instance.GetStats.SetCorruption(gameBoard.GetCorruption());
+
+        GameManager.Instance.Board.ShowMessages(_gridPosition);
         return false;
     }
 
@@ -188,12 +207,14 @@ public class Player
                     GameManager.Instance.UpdatePath();
                     GameManager.Instance.CameraController.SetPosition(board.GridToWorld(newPos));
                     _plrTgt = board.GridToWorld(_gridPosition);
+                    GameManager.Instance.Board.ShowMessages(_gridPosition);
                     break;
 
                 case 3:
                     _gridPosition = newPos;
                     GameManager.Instance.CameraController.SetPosition(board.GridToWorld(newPos));
                     _plrTgt = board.GridToWorld(_gridPosition);
+                    GameManager.Instance.Board.ShowMessages(_gridPosition);
                     break;
 
                 case 2:
@@ -203,6 +224,7 @@ public class Player
                     GameManager.Instance.UpdatePath();
                     GameManager.Instance.CameraController.SetPosition(board.GridToWorld(newPos));
                     _plrTgt = board.GridToWorld(_gridPosition);
+                    GameManager.Instance.Board.ShowMessages(_gridPosition);
                     break;
             }
         }

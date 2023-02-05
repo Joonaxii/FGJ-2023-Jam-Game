@@ -20,7 +20,6 @@ public class Unit : MonoBehaviour
     public Renderer[] rends;
 
     protected UnitState _state;
-    public WeightedType<HackingBase>[] minigamePool;
     protected int _boardID;
     protected GameManager _mngr;
 
@@ -109,11 +108,15 @@ public class Unit : MonoBehaviour
         switch (_state)
         {
             case UnitState.BeingHacked:
-                if(minigamePool.Length < 1)
-                {
-                    SetUnitState(UnitState.Done);
-                    return;
-                }
+                GameManager.Instance.Hacking.BeginHacking((bool valid) => {
+                    if (valid)
+                    {
+                        SetUnitState(UnitState.Done);
+                        return;
+                    }
+                    SetUnitState(UnitState.Fail);
+
+                });
                 break;
 
             case UnitState.Done:
@@ -125,6 +128,17 @@ public class Unit : MonoBehaviour
                 _mngr.GetStats.UpdateStats();
                 _cb?.Invoke(1);
                 RefreshHackState();
+                break;
+
+            case UnitState.Fail:
+
+                ref var tileB = ref _mngr.Board[_boardID];
+                _mngr.Board.SetTileState(ref tileB, false);
+
+                _mngr.GetStats.UpdateStats();
+                _cb?.Invoke(0);
+                RefreshHackState();
+                _state = UnitState.None;
                 break;
         }
     }

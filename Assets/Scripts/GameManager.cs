@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Windows;
 
 public class GameManager : MonoBehaviour
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     public Player Player => _player;
     public GameBoard Board => _board;
     public InputHandler Inputs => _inputs;
+    public HackingManager Hacking => _hackingManager;
 
     public GameStats GetStats => _stats;
 
@@ -29,6 +31,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AnimationCurve _cameraMoveCurve;
 
     [SerializeField] private InGameUI _inGameUI;
+    [SerializeField] private HackingManager _hackingManager;
+    [SerializeField] private MainMenu _mainMenu;
 
     private InputHandler _inputs;
 
@@ -41,24 +45,18 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         _inputs = new InputHandler();
         _path = transform.Find("Path").GetComponent<LineRenderer>();
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-
         GTime.Init();
     }
 
+    public void CloseHacking() => _hackingManager.CancelHack();
+
     IEnumerator Start()
     {
-
+        _mainMenu.OpenMainMenu();
+        _hackingManager.Reset();
 #if !UNITY_EDITOR
         Screen.SetResolution(1280, 720, false);
         yield return null;
@@ -106,6 +104,7 @@ public class GameManager : MonoBehaviour
     {
         _path.positionCount = 0;
 
+        _hackingManager.Reset();
         GTime.Reset();
         _stats.Reset();
 
@@ -185,7 +184,10 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            _player.Update(delta);
+            if (!_hackingManager.IsHacking)
+            {
+                _player.Update(delta);
+            }
         }
     }
 
@@ -203,9 +205,9 @@ public class GameManager : MonoBehaviour
         StartCoroutine(_scan);
     }
 
-    public void TriggerDetection()
+    public void Restart()
     {
-
+        SceneManager.LoadScene(0);
     }
 
     private IEnumerator _scan;

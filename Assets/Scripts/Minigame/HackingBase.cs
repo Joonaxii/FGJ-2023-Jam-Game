@@ -5,6 +5,9 @@ using UnityEngine;
 public abstract class HackingBase : MonoBehaviour
 {
     public abstract void Initialize();
-    public abstract void Finish();
+    public virtual void Finish()
+    {
+        GameManager.Instance.Hacking.CompleteHacking();
+    }
     public abstract void Cancel();
 }

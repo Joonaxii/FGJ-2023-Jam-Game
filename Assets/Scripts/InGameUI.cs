@@ -38,7 +38,7 @@ public class InGameUI
         }
 
         TimeSpan span = TimeSpan.FromSeconds(nextScan);
-        scanTimeText.text = $"<color=#{color}>Next scan - {span.TotalSeconds:00}</color> ({corruption * 100.0f:F1}% infected!)";
+        scanTimeText.text = $"<color=#{color}>Next scan - {span.ToString(@"mm\:ss")}</color> ({corruption * 100.0f:F1}% infected!)";
     }
 
     public void UpdateDetections(int detections, int max)

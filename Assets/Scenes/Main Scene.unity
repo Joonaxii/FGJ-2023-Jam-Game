@@ -761,34 +761,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _stats._baseBitCapacity
-      value: 64
-      objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _board.overClockedColor.b
-      value: 1.4490029
-      objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _board.overClockedColor.r
-      value: 0.69109946
-      objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _stats._baseBitsPerSecond
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _board.overClockedColorHacked.b
-      value: 3.8113208
-      objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _board.overClockedColorHacked.g
-      value: 0.4134924
-      objectReference: {fileID: 0}
-    - target: {fileID: 3229913053383858524, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
-      propertyPath: _board.overClockedColorHacked.r
-      value: 3.8113208
-      objectReference: {fileID: 0}
     - target: {fileID: 3229913053383858525, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -833,7 +805,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 369207785528574013, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 6572755865925207143, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 5958268280241366919, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 8744959562908026015, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 8893888570183281126, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 1468614834515940324, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 3845978953209065420, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
+    - {fileID: 8793629696954222582, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ce50ac2c282c82f41afee3faf000db3b, type: 3}
 --- !u!1001 &6800240427270702345
 PrefabInstance:
