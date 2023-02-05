@@ -6,7 +6,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Clock-Tower_CLOCK
+  m_Name: Bit-Capacitor
   serializedVersion: 5
   m_AnimatorParameters: []
   m_AnimatorLayers:
@@ -29,7 +29,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Clock
+  m_Name: Armature|ArmatureAction
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -42,7 +42,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -6266152643596575308, guid: 9df995a6e5ad9bd4382d407101b6c25c, type: 3}
+  m_Motion: {fileID: 3689517109365214182, guid: 01bedf5c8998f2f49bf1611528b3c93d, type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

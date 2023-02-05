@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get; private set; }
 
+    public InGameUI GameUI => _inGameUI;
     public CameraController CameraController => _cameraCtrl;
     public Player Player => _player;
     public GameBoard Board => _board;
@@ -18,12 +19,16 @@ public class GameManager : MonoBehaviour
 
     public GameStats GetStats => _stats;
 
+    public bool IsScanInProgress => _scanInProgress;
+
     [SerializeField] private GameStats _stats;
-    private Player _player;
+    [SerializeField] private Player _player;
     [SerializeField] private GameBoard _board;
 
     [SerializeField] private CameraController _cameraCtrl;
     [SerializeField] private AnimationCurve _cameraMoveCurve;
+
+    [SerializeField] private InGameUI _inGameUI;
 
     private InputHandler _inputs;
 
@@ -46,30 +51,38 @@ public class GameManager : MonoBehaviour
         _path = transform.Find("Path").GetComponent<LineRenderer>();
         Instance = this;
         DontDestroyOnLoad(gameObject);
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+
+
+        GTime.Init();
+    }
+
+    IEnumerator Start()
+    {
+
+#if !UNITY_EDITOR
+        Screen.SetResolution(1280, 720, false);
+        yield return null;
         BorderlessWindow.InitializeOnLoad();
         BorderlessWindow.RestoreWindow();
 #endif
-        GTime.Init();
-
-        _player = new Player();
+        yield return null;
     }
 
     public void MinimizeWindow()
     {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if !UNITY_EDITOR
         BorderlessWindow.MinimizeWindow();
 #endif
     }
     public void MaximizeWindow()
     {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if !UNITY_EDITOR
         BorderlessWindow.MaximizeWindow();
 #endif
     }
     public void RestoreWindow()
     {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if !UNITY_EDITOR
         BorderlessWindow.RestoreWindow();
 #endif
     }
@@ -77,7 +90,7 @@ public class GameManager : MonoBehaviour
     public void ToggleWindowSize()
     {
         _maximize = !_maximize;
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if !UNITY_EDITOR
         if(_maximize)
         {
             BorderlessWindow.RestoreWindow();
@@ -101,6 +114,10 @@ public class GameManager : MonoBehaviour
 
         _cameraCtrl.SetPosition(Vector3.zero, true);
         _cameraCtrl.SetNearFarBlend(1.0f, true);
+
+        _inGameUI.UpdateDetections(_stats.Detections, _stats.MaxDetections);
+        _inGameUI.UpdateBitAmount(_stats.Bits, _stats.BitCapacity, _stats.BitsPerSecond, _player.AccumulatedCost);
+        _inGameUI.UpdateScanTime(_stats.ScanInterval - _stats.ScanTime, _stats.Corruption);
 
         UpdatePath();
     }
@@ -175,6 +192,7 @@ public class GameManager : MonoBehaviour
     public void StartScan()
     {
         _scanInProgress = true;
+        _inGameUI.UpdateScanTime(0, _stats.Corruption);
 
         if (_scan != null)
         {
@@ -197,12 +215,12 @@ public class GameManager : MonoBehaviour
         float t = 0;
         while (t < fadeDur)
         {
-            _cameraCtrl.SetNearFarBlend(_cameraMoveCurve.Evaluate(t / fadeDur), true);
+            _cameraCtrl.SetNearFarBlend(_cameraMoveCurve.Evaluate(t / fadeDur), false);
             t += GTime.GetDeltaTime(0);
             yield return null;
         }
 
-        _cameraCtrl.SetNearFarBlend(1.0f, true);
+        _cameraCtrl.SetNearFarBlend(1.0f, false);
 
         int width = _board.Width;
         for (int i = 0; i < width; i++)
@@ -215,7 +233,7 @@ public class GameManager : MonoBehaviour
             {
                 StartCoroutine(_board.BeginScan(i));
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(Mathf.Lerp(0.65f, 0.05f, _stats.Corruption));
         }
         _scanInProgress = false;
 
@@ -223,11 +241,12 @@ public class GameManager : MonoBehaviour
         t = 0;
         while (t < fadeDur)
         {
-            _cameraCtrl.SetNearFarBlend(1.0f - _cameraMoveCurve.Evaluate(t / fadeDur), true);
+            _cameraCtrl.SetNearFarBlend(1.0f - _cameraMoveCurve.Evaluate(t / fadeDur), false);
             t += GTime.GetDeltaTime(0);
             yield return null;
         }
 
-        _cameraCtrl.SetNearFarBlend(0.0f, true);
+        _cameraCtrl.SetNearFarBlend(0.0f, false);
+        _inGameUI.UpdateScanTime(_stats.ScanInterval - _stats.ScanTime, _stats.Corruption);
     }
 }

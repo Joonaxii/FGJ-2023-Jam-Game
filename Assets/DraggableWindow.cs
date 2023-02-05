@@ -13,7 +13,7 @@ public class DraggableWindow : MonoBehaviour, IDragHandler
         _deltaValue += data.delta;
         if (data.dragging)
         {
-#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
+#if !UNITY_EDITOR
             BorderlessWindow.MoveWindowPos(_deltaValue, Screen.width, Screen.height);
 #endif
         }
