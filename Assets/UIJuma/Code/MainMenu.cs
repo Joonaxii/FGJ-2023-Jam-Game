@@ -12,8 +12,7 @@ public enum Menus
     None = 0,
     Main = 1,
     Run = 2,
-    Customize = 3,
-    Credits = 4,
+    Credits = 3,
 }
 [System.Serializable]
 public class MenuButton 
@@ -27,10 +26,11 @@ public class MainMenu : MonoBehaviour
 {
     [Header("UI Components")]
     public MenuButton[] mainMenuOptions;
+    public MenuButton creditsBackButton;
     public TextMeshProUGUI mainText;
     public TextMeshProUGUI descriptionBox;
     [Space(10), Header("Current variables")]
-    private string _curStringDefault = "";
+    [SerializeField] private string _curStringDefault = "";
     public Menus curMenu = Menus.Main;
     public int curOption = 0;
     public int currentPage;
@@ -48,11 +48,11 @@ public class MainMenu : MonoBehaviour
     private int _pressed = 0;
     public Color highlightColor;
 
+    private string _creditsText = "This game was made on FGJ 2023 @Kajaani.\n - Team -\nJoona Rissanen - Programming and Unity Magic\nValtteri Leino - Graphics and Animation\nOtto-Pekka Taskinen - UI, Programming, and SFX";
     private string _mainText = "Macrohard Walls [Version 64.5177.34.77395.7675863.51]\n(c) Macrohard Freelancing. All rights are not reserved.\n\n{0}";
     private string[] _mainMenuText = {
         "C:\\Users\\INTO_THE_ROOT>",
         "C:\\Users\\INTO_THE_ROOT\\Run>",
-        "C:\\Users\\INTO_THE_ROOT\\Customize>",
         "C:\\Users\\INTO_THE_ROOT\\Credits>",
     };
 
@@ -126,9 +126,13 @@ public class MainMenu : MonoBehaviour
         descriptionBox.enabled = false;
         _hackTextTimer = 0;
         _canMove = true;
+        curMenu = Menus.Main;
         mainText.text = string.Format(_mainText, _mainMenuText[0]);
         curOption = 0;
         SetHighlight(mainMenuOptions[curOption].buttonText);
+
+        creditsBackButton.interactable = false;
+        creditsBackButton.buttonText.enabled = false;
 
         windowMax.sprite = windowResizeSprites[GameManager.IsMaximized ? 1 : 0];
     }
@@ -155,60 +159,66 @@ public class MainMenu : MonoBehaviour
         if (!_canMove) return;
         var Inputs = GameManager.Instance.Inputs;
 
-        if (_pressed != 0)
-        {
-            _moveTimer -= Time.deltaTime;
-            if (_moveTimer <= 0)
-            {
-                ChangeOption(_pressed);
-                _moveTimer = moveTime;
-            }
-        }
-
         if (Inputs.IsDown(InputHandler.InputType.Confirm))
         {
             SelectOption();
         }
 
-        if (Inputs.IsDown(InputHandler.InputType.MoveUp))
+        if (curMenu == Menus.Main)
         {
-            _pressed = -1;
-            _moveTimer = initialMoveTime;
-            ChangeOption(_pressed);
-        }
-        if (Inputs.IsUp(InputHandler.InputType.MoveUp))
-        {
-            ResetMovement();
-        }
+            if (_pressed != 0)
+            {
+                _moveTimer -= Time.deltaTime;
+                if (_moveTimer <= 0)
+                {
+                    ChangeOption(_pressed);
+                    _moveTimer = moveTime;
+                }
+            }
 
-        if (Inputs.IsDown(InputHandler.InputType.MoveDown))
-        {
-            _pressed = 1;
-            _moveTimer = initialMoveTime;
-            ChangeOption(_pressed);
-        }
-        if (Inputs.IsUp(InputHandler.InputType.MoveDown))
-        {
-            ResetMovement();
+            if (Inputs.IsDown(InputHandler.InputType.MoveUp))
+            {
+                _pressed = -1;
+                _moveTimer = initialMoveTime;
+                ChangeOption(_pressed);
+            }
+            if (Inputs.IsUp(InputHandler.InputType.MoveUp))
+            {
+                ResetMovement();
+            }
+
+            if (Inputs.IsDown(InputHandler.InputType.MoveDown))
+            {
+                _pressed = 1;
+                _moveTimer = initialMoveTime;
+                ChangeOption(_pressed);
+            }
+            if (Inputs.IsUp(InputHandler.InputType.MoveDown))
+            {
+                ResetMovement();
+            }
         }
     }
 
     void ChangeOption(int dir)
     {
-        ResetHighlight(mainMenuOptions[curOption].buttonText);
-        if (curOption == 0 && dir == -1)
+        if (curMenu == Menus.Main || curOption == -1)
         {
-            curOption = mainMenuOptions.Length - 1;
+            ResetHighlight(mainMenuOptions[curOption].buttonText);
+            if (curOption == 0 && dir == -1)
+            {
+                curOption = mainMenuOptions.Length - 1;
+            }
+            else if (curOption == mainMenuOptions.Length-1 && dir == 1)
+            {
+                curOption = 0;
+            } 
+            else
+            {
+                curOption += dir;
+            }
+            SetHighlight(mainMenuOptions[curOption].buttonText);
         }
-        else if (curOption == mainMenuOptions.Length-1 && dir == 1)
-        {
-            curOption = 0;
-        } 
-        else
-        {
-            curOption += dir;
-        }
-        SetHighlight(mainMenuOptions[curOption].buttonText);
     }
     void ResetMovement()
     {
@@ -232,7 +242,17 @@ public class MainMenu : MonoBehaviour
     }
     #endregion
 
-    void SelectOption() => ChangeMenu(mainMenuOptions[curOption].destination);
+    void SelectOption()
+    {
+        if (curMenu == Menus.Credits)
+        {
+            ChangeMenu(creditsBackButton.destination);
+        }
+        else
+        {
+            ChangeMenu(mainMenuOptions[curOption].destination);
+        }
+    }
 
     void ChangeMenu(Menus nextMenu)
     {
@@ -243,34 +263,67 @@ public class MainMenu : MonoBehaviour
         {
             case Menus.Main:
                 // TODO: Open main menu and enable main menu options
-                OpenMenu(Menus.Main);
+                CloseCredits();
+                ResetHighlight(creditsBackButton.buttonText);
+                curOption = 0;
+                OpenMainMenu();
+                OpenMain();
                 break;
+
             case Menus.Run:
+                CloseCredits();
                 _canMove = false;
-                OpenMenu(Menus.Run);
+                CloseMain();
+                //OpenMenu(Menus.Run);
                 StartCoroutine(HackerTexts());
                 break;
-            case Menus.Customize:
-                break;
             case Menus.Credits:
+                CloseMain();
+                OpenCredits();
+                curMenu = Menus.Credits;
                 break;
         }
     }
 
-    void OpenMenu(Menus newMenu)
+    void CloseCredits()
     {
-        CloseMenu(curMenu);
-        // TODO: Set new stuff to appear 
+        creditsBackButton.interactable = false;
+        creditsBackButton.buttonText.enabled = false;
 
+        descriptionBox.enabled = false;
+        descriptionBox.text = "";
+
+        curOption = 0;
+        ResetHighlight(creditsBackButton.buttonText);
     }
-    void CloseMenu(Menus menu)
+    void OpenCredits()
     {
-        // TODO: Close the current menu
+        creditsBackButton.interactable = true;
+        creditsBackButton.buttonText.enabled = true;
+
+        descriptionBox.enabled = true;
+        descriptionBox.text = _creditsText;
+
+        curOption = -1;
+        SetHighlight(creditsBackButton.buttonText);
+    }
+
+    void OpenMain()
+    {
+        foreach (var textButton in mainMenuOptions)
+        {
+            textButton.interactable = true;
+            textButton.buttonText.enabled = true;
+        }
+    }
+    void CloseMain()
+    {
         foreach (var textButton in mainMenuOptions)
         {
             textButton.interactable = false;
             textButton.buttonText.enabled = false;
         }
+        ResetHighlight(mainMenuOptions[curOption].buttonText);
     }
 
     IEnumerator HackerTexts()
