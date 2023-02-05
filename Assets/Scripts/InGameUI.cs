@@ -6,6 +6,7 @@ public class InGameUI
 {
     public TextMeshProUGUI bitAmountText;
     public TextMeshProUGUI scanTimeText;
+    public TextMeshProUGUI scanTimeFullText;
     public TextMeshProUGUI detectionsText;
 
     public void UpdateBitAmount(int bits, int max, float bps, int minus)
@@ -23,7 +24,7 @@ public class InGameUI
     {
         if (nextScan <= 0)
         {
-            scanTimeText.text = $"<color=#00F0FF>Scan in progress...</color> ({corruption * 100.0f:F1}% infected!)";
+            scanTimeText.text = $"<color=#00F0FF>Quick scan in progress...</color> ({corruption * 100.0f:F1}% infected!)";
             return;
         }
         string color = "FFFFFF";
@@ -38,7 +39,29 @@ public class InGameUI
         }
 
         TimeSpan span = TimeSpan.FromSeconds(nextScan);
-        scanTimeText.text = $"<color=#{color}>Next scan - {span.ToString(@"mm\:ss")}</color> ({corruption * 100.0f:F1}% infected!)";
+        scanTimeText.text = $"<color=#{color}>Next quick scan - {span.ToString(@"mm\:ss")}</color> ({corruption * 100.0f:F1}% infected!)";
+    }
+
+    public void UpdateFullScanTime(float nextScan)
+    {
+        if (nextScan <= 0)
+        {
+            scanTimeFullText.text = $"<color=#FF0000>You're boned!</color>";
+            return;
+        }
+        string color = "FFFFFF";
+
+        if (nextScan < 30.0f)
+        {
+            color = "FFA000";
+        }
+        else if (nextScan < 4.0f)
+        {
+            color = "FFF00";
+        }
+
+        TimeSpan span = TimeSpan.FromSeconds(nextScan);
+        scanTimeFullText.text = $"<color=#{color}>Full scan - {span.ToString(@"mm\:ss")}</color>";
     }
 
     public void UpdateDetections(int detections, int max)

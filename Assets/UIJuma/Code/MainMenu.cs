@@ -93,6 +93,7 @@ public class MainMenu : MonoBehaviour
         new ("Packing small data...",6),
         new ("Opening the database...",6),
         new ("Device disconnected...",4),
+        new ("Entering the backrooms...",4),
         new ("Updating Macrohard Walls...",4),
         new ("Throttling the network...",4),
         new ("Booting up Source-SDK...",4),
@@ -106,9 +107,11 @@ public class MainMenu : MonoBehaviour
         new ("Accepting cookies...",4),
         new ("Collecting tokens...",4),
         new ("Preparing pump 'n' dump...",4),
+        new ("/gamemode 1...",4),
         new ("Feeding the mouse...",4),
         new ("Rebooting...",4),
         new ("hehe haha, 80085...",2),
+        new ("sv_cheats 1...",2),
         new ("Searching for Imposters...",2),
         new ("Sorting passwords (w/ BogoSort)...",2),
         new ("Unchaining the Blockchain...",2),
@@ -118,6 +121,8 @@ public class MainMenu : MonoBehaviour
         new ("Screenshotting NFTs...",1),
         new ("Installing Bonzi Buddy...",1),
         new ("Attempting to hack: Edna (Attempt #220)...",1),
+        new ("hYV‰‰ kOOdIa!...",0.05f),
+        new ("Bad to the bone!...",0.025f),
     };
 
     // Start is called before the first frame update
@@ -129,7 +134,7 @@ public class MainMenu : MonoBehaviour
         curMenu = Menus.Main;
         mainText.text = string.Format(_mainText, _mainMenuText[0]);
         curOption = 0;
-        SetHighlight(mainMenuOptions[curOption].buttonText);
+       // SetHighlight(mainMenuOptions[curOption].buttonText);
 
         creditsBackButton.interactable = false;
         creditsBackButton.buttonText.enabled = false;
@@ -363,5 +368,21 @@ public class MainMenu : MonoBehaviour
         }
         menuCanvas.alpha = 0;
         yield return StartCoroutine(GameManager.Instance.StartGame());
+    }
+
+    public IEnumerator FadeCameraBack()
+    {
+        float fadeDuration = 1.5f;
+        float fadeTime = 0;
+
+        while (fadeTime < fadeDuration)
+        {
+            float n = fadeTime / fadeDuration;
+            menuCanvas.alpha =  n;
+
+            fadeTime += GTime.GetDeltaTime(0);
+            yield return null;
+        }
+        menuCanvas.alpha = 1.0f;
     }
 }

@@ -34,7 +34,11 @@ public class MazePlayerController : MonoBehaviour
             _rb2D.rotation += -turnSpeed * GTime.GetDeltaTime(0);
         }
 
-        if (Inputs.IsHeld(InputHandler.InputType.MoveUp) && _mazeManager.isActive)
+    }
+
+    private void FixedUpdate()
+    {
+        if (GameManager.Instance.Inputs.IsHeld(InputHandler.InputType.MoveUp) && _mazeManager.isActive)
         {
             _rb2D.AddForce(transform.up * acceleration);
             var vel = _rb2D.velocity;

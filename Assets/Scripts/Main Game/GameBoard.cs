@@ -9,7 +9,7 @@ using Debug = UnityEngine.Debug;
 [System.Serializable]
 public class GameBoard
 {
-    private const float PADDING = 0.5f;
+    public const float PADDING = 0.5f;
 
     public int Width => _width;
     public int Height => _height;
@@ -60,6 +60,19 @@ public class GameBoard
         public bool IsBeingScanned() => (flags & TileFlags.BeingScanned) != 0;
     }
 
+    public int RootsCorrupted 
+    { 
+        get => _rootsCorrupted;
+        set
+        {
+            _rootsCorrupted = value;
+            if(_rootsCorrupted >= _maxRoots)
+            {
+                GameManager.Instance.StartWin();
+            }
+        }
+    }
+
     [ColorUsage(true, true)] public Color hackedColor = Color.red;
     [ColorUsage(true, true)] public Color normalColor = Color.green;
     [ColorUsage(true, true)] public Color unitColor = Color.green;
@@ -78,6 +91,7 @@ public class GameBoard
     public WorldText[] texts;
 
     private BoardTile[] _board;
+    private int _maxRoots = 2;
 
     private Transform _gridRoot;
     private SpriteRenderer[] _glowRends;
@@ -87,6 +101,7 @@ public class GameBoard
     private IEnumerator[] _scans;
 
     private int[] _virusMask = new int[8];
+    private int _rootsCorrupted;
 
     public static float TileTypeToBitCost(TileType type, float difficultyMult = 1.0f)
     {
@@ -94,11 +109,13 @@ public class GameBoard
         {
             case TileType.Empty: return 1 * difficultyMult;
             case TileType.BitGenerator: return 16 * difficultyMult;
-            case TileType.BitCapacitor: return 16 * difficultyMult;
-            case TileType.SystemClock: return 48 * difficultyMult;
-            case TileType.CPU: return 64 * difficultyMult;
-            case TileType.Firewall: return 256 * difficultyMult;
-            case TileType.System32: return 1024 * difficultyMult;
+            case TileType.BitCapacitor: return 32 * difficultyMult;
+            case TileType.SystemClock:  return 56 * difficultyMult;
+            case TileType.CPU:          return 48 * difficultyMult;
+            case TileType.Firewall:     
+                return Mathf.Lerp(4096, 64, GameManager.Instance.GetStats.Corruption) * difficultyMult;
+            case TileType.System32: 
+                return Mathf.Lerp(8192 * 2, 256, GameManager.Instance.GetStats.Corruption) * difficultyMult;
             default: return 0;
         }
     }
@@ -298,13 +315,17 @@ public class GameBoard
         }
     }
 
-    public void Generate(int width, int height)
+    public void HideAllTexts()
     {
         for (int i = 0; i < texts.Length; i++)
         {
             texts[i].Setup(Vector3.zero, false, "");
         }
+    }
 
+    public void Generate(int width, int height)
+    {
+        HideAllTexts();
         if (_board != null)
         {
             foreach (var item in _board)
@@ -402,10 +423,10 @@ public class GameBoard
             OccupyTiles(rightFWA, 1, 1, TileType.Firewall, false);
             OccupyTiles(rightFWB, 1, 1, TileType.Firewall, false);
 
-            const int NUM_OF_BIT_GEN = 24;
-            const int NUM_OF_BIT_CAP = 24;
-            const int NUM_OF_BIT_CPU = 24;
-            const int NUM_OF_BIT_CLOCK = 24;
+            const int NUM_OF_BIT_GEN   = 24;
+            const int NUM_OF_BIT_CAP   = 16;
+            const int NUM_OF_BIT_CPU   = 16;
+            const int NUM_OF_BIT_CLOCK = 16;
 
             (int, TileType)[] UNITS = new (int, TileType)[]
             {
@@ -415,13 +436,11 @@ public class GameBoard
                 (NUM_OF_BIT_CLOCK, TileType.SystemClock),
             };
 
-
             List<Vector2Int> coords = new List<Vector2Int>();
-
             for (int i = 0; i < _board.Length; i++)
             {
                 ref var tileL = ref _board[i];
-                if (tileL.type == TileType.Empty)
+                if (tileL.type == TileType.Empty && !tileL.IsHacked())
                 {
                     coords.Add(new Vector2Int(i % _width, i / _width));
                 }
@@ -508,6 +527,18 @@ public class GameBoard
         }
 
         GameManager.Instance.GetStats.SetCorruption(GetCorruption());
+    }
+
+    public void LerpBetweenBaseAndScan(float time, int index)
+    {
+        ref var tile = ref _board[index];
+        _glowRends[index].color = Color.Lerp(tile.currentColor, scanColor, time);
+    }
+
+    public void LerpBetweenBaseAndHacked(float time, int index)
+    {
+        ref var tile = ref _board[index];
+        _glowRends[index].color = Color.Lerp(tile.currentColor, hackedColor, time);
     }
 
     public float GetCorruption()

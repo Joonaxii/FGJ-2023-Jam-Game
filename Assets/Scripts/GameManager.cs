@@ -1,14 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Windows;
 
 public class GameManager : MonoBehaviour
 {
     public static bool IsMaximized => !Instance._maximize;
+    public bool YoureBoned => _youreBoned;
 
     public static GameManager Instance { get; private set; }
 
@@ -19,9 +19,13 @@ public class GameManager : MonoBehaviour
     public InputHandler Inputs => _inputs;
     public HackingManager Hacking => _hackingManager;
 
+    public AudioManager AudioManager => _audioManager;
     public GameStats GetStats => _stats;
 
     public bool IsScanInProgress => _scanInProgress;
+
+    public Animator virusAnim;
+    public ParticleSystem psDeath;
 
     [SerializeField] private GameStats _stats;
     [SerializeField] private Player _player;
@@ -37,9 +41,11 @@ public class GameManager : MonoBehaviour
     private InputHandler _inputs;
 
     private LineRenderer _path;
+    [SerializeField] private AudioManager _audioManager;
 
     private bool _gameStarted;
     private bool _scanInProgress;
+    private bool _youreBoned;
 
     private bool _maximize = true;
 
@@ -48,7 +54,10 @@ public class GameManager : MonoBehaviour
         _inputs = new InputHandler();
         _path = transform.Find("Path").GetComponent<LineRenderer>();
         Instance = this;
+
+        _youreBoned = false;
         GTime.Init();
+        _audioManager.Initialize();
     }
 
     public void CloseHacking() => _hackingManager.CancelHack();
@@ -58,7 +67,7 @@ public class GameManager : MonoBehaviour
         _mainMenu.OpenMainMenu();
         _hackingManager.Reset();
 #if !UNITY_EDITOR
-        Screen.SetResolution(1280, 720, false);
+        Screen.SetResolution(1600, 900, false);
         yield return null;
         BorderlessWindow.InitializeOnLoad();
         BorderlessWindow.RestoreWindow();
@@ -104,6 +113,9 @@ public class GameManager : MonoBehaviour
     {
         _path.positionCount = 0;
 
+        virusAnim.SetBool("IsDead", false);
+
+        _youreBoned = false;
         _hackingManager.Reset();
         GTime.Reset();
         _stats.Reset();
@@ -117,6 +129,7 @@ public class GameManager : MonoBehaviour
         _inGameUI.UpdateDetections(_stats.Detections, _stats.MaxDetections);
         _inGameUI.UpdateBitAmount(_stats.Bits, _stats.BitCapacity, _stats.BitsPerSecond, _player.AccumulatedCost);
         _inGameUI.UpdateScanTime(_stats.ScanInterval - _stats.ScanTime, _stats.Corruption);
+        _inGameUI.UpdateFullScanTime(_stats.FullScanDuration - _stats.FullScanTime);
 
         UpdatePath();
     }
@@ -168,7 +181,16 @@ public class GameManager : MonoBehaviour
     {
         GTime.Tick(Time.deltaTime);
 
+        _audioManager.Update();
         _inputs.Update();
+
+        if (_youreBoned)
+        {
+            float delta = GTime.GetDeltaTime(0);
+            _cameraCtrl.Update(delta);
+
+            return;
+        }
 
         if (_gameStarted)
         {
@@ -178,9 +200,14 @@ public class GameManager : MonoBehaviour
             _stats.Update(delta);
             if (!_scanInProgress)
             {
-                if (_stats.UpdateScan(delta))
+                switch (_stats.UpdateScan(delta))
                 {
-                    StartScan();
+                    case 1:
+                        StartScan();
+                        break;
+                    case 2:
+                        StartFinalScan();
+                        return;
                 }
             }
 
@@ -191,8 +218,205 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void StartWin()
+    {
+        _youreBoned = true;
+        if (_hackingManager.IsHacking)
+        {
+            _hackingManager.CancelHack();
+        }
+
+        StopAllCoroutines();
+        StartCoroutine(_scan = FinalWin());
+    }
+
+    private IEnumerator FinalWin()
+    {
+        _player.ResetPlayer(_board);
+        _board.HideAllTexts();
+
+        _cameraCtrl.SetPosition(new Vector3(0, 1.0f, -3));
+        _cameraCtrl.SetNearFarBlend(0.25f, false);
+
+        yield return new WaitForSeconds(1.25f);
+
+        float finalScanDur = 0.4f;
+
+        float[] offsets = new float[_board.Width * _board.Height];
+        float maxDist = (_board.Width * GameBoard.PADDING) * 5;
+        for (int i = 0; i < offsets.Length; i++)
+        {
+            Vector3 pos = _board.GridToWorld(new Vector2Int(i % _board.Width, i / _board.Width));
+            float idst = pos.magnitude;
+
+            float n = 1.0f - Mathf.Clamp01(idst / maxDist);
+            offsets[i] = Mathf.Lerp(0.0f, -2.5f, n * n * n * n);
+        }
+
+        GameManager.Instance.AudioManager.PlaySFX("PlayerWin2");
+        while (true)
+        {
+            bool done = true;
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                var f = offsets[i] + GTime.GetDeltaTime(0);
+                offsets[i] = f;
+                float n = Mathf.Clamp01(f / finalScanDur);
+
+                n = n * n * n;
+                _board.LerpBetweenBaseAndHacked(n, i);
+                if (f < finalScanDur)
+                {
+                    done = false;
+                }
+                else if(n >= 0.5f)
+                {
+                    var p = new Vector2Int(i % _board.Width, i / _board.Width);
+                    if (!_board[p].IsHacked())
+                    {
+                        _board.SetTileState(p, true);
+                        _board[p].unit?.RefreshHackState();
+                    }
+                }
+            }
+
+            if (done) { break; }
+            yield return null;
+        }
+
+
+        float fadeTimeXD = 0.5f;
+        float t = 0;
+
+        _cameraCtrl.SetNearFarBlend(1.0f, false);
+        _cameraCtrl.SetPosition(new Vector3(0, -41, 3));
+
+        yield return new WaitForSeconds(1.5f);
+
+        GameManager.Instance.AudioManager.PlaySFX("SkeletonLaughSpoopy");
+        yield return new WaitForSeconds(0.75f);
+        yield return StartCoroutine(_mainMenu.FadeCameraBack());
+        Restart();
+    }
+
+
+
+    public void StartFinalScan()
+    {
+        GameManager.Instance.AudioManager.PlaySFX("VirusFound");
+
+        _youreBoned = true;
+        _inGameUI.UpdateFullScanTime(0);
+        if (_hackingManager.IsHacking)
+        {
+            _hackingManager.CancelHack();
+        }
+
+        StopAllCoroutines();
+        StartCoroutine(_scan = FinalScan());
+    }
+
+    private IEnumerator FinalScan()
+    {
+        MaterialPropertyBlock props = new MaterialPropertyBlock();
+        props.SetFloat("_Palette_Blend", 1.0f);
+
+        Renderer[] rends = virusAnim.GetComponentsInChildren<Renderer>();
+        foreach (var item in rends)
+        {
+            item.SetPropertyBlock(props);
+        }
+
+        _player.ResetPlayer(_board);
+        _board.HideAllTexts();
+
+        yield return null;
+        _cameraCtrl.SetPosition(new Vector3(0, 1.0f, -3));
+        _cameraCtrl.SetNearFarBlend(0.25f, false);
+
+        yield return new WaitForSeconds(1.25f);
+
+        float finalScanDur = 0.4f;
+
+        float[] offsets = new float[_board.Width * _board.Height];
+
+        float maxDist = (_board.Width * GameBoard.PADDING) * 5;
+        for (int i = 0; i < offsets.Length; i++)
+        {
+            Vector3 pos = _board.GridToWorld(new Vector2Int(i % _board.Width, i / _board.Width));
+            float idst = pos.magnitude;
+
+            float n = 1.0f - Mathf.Clamp01(idst / maxDist);
+            offsets[i] = Mathf.Lerp(0.0f, -2.5f, n * n * n * n);
+        }
+
+        while (true)
+        {
+            bool done = true;
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                var f = offsets[i] + GTime.GetDeltaTime(0);
+                offsets[i] = f;
+                float n = Mathf.Clamp01(f / finalScanDur);
+
+                n = n * n * n;
+                _board.LerpBetweenBaseAndScan(n, i);
+                if (f < finalScanDur)
+                {
+                    done = false;
+                }
+                else if(n >= 0.5f)
+                {
+                    var p = new Vector2Int(i % _board.Width, i / _board.Width);
+                    if (_board[p].IsHacked())
+                    {
+                        _board.SetTileState(p, false);
+                        _board[p].unit?.RefreshHackState();
+                    }
+                }
+
+
+            }
+
+            if (done) { break; }
+            yield return null;
+        }
+
+
+        float fadeTimeXD = 0.5f;
+        float t = 0;
+
+        while (t < fadeTimeXD)
+        {
+            props.SetFloat("_Palette_Blend", 1.0f - (t / fadeTimeXD));
+            foreach (var item in rends)
+            {
+                item.SetPropertyBlock(props);
+            }
+            t += GTime.GetDeltaTime(0);
+            yield return null;
+        }
+        props.SetFloat("_Palette_Blend", 0.0f);
+        foreach (var item in rends)
+        {
+            item.SetPropertyBlock(props);
+        }
+        _cameraCtrl.SetNearFarBlend(1.0f, false);
+        _cameraCtrl.SetPosition(new Vector3(0, -41, 3));
+
+        yield return new WaitForSeconds(1.5f);
+        virusAnim.SetBool("IsDead", true);
+        yield return new WaitForSeconds(1.0f);
+        GameManager.Instance.AudioManager.PlaySFX("PlayerDeath");
+        MonoBehaviour.Instantiate(psDeath, virusAnim.transform.position + new Vector3(0, 1.0f, 0), Quaternion.Euler(-90, 0, 0));
+        yield return new WaitForSeconds(1.5f);
+        yield return StartCoroutine(_mainMenu.FadeCameraBack());
+        Restart();
+    }
+
     public void StartScan()
     {
+        if (_youreBoned) { return; }
         _scanInProgress = true;
         _inGameUI.UpdateScanTime(0, _stats.Corruption);
 
@@ -213,6 +437,9 @@ public class GameManager : MonoBehaviour
     private IEnumerator _scan;
     private IEnumerator ScanSequence()
     {
+
+        GameManager.Instance.AudioManager.PlaySFX("ScanStart");
+
         float fadeDur = 1.5f;
         float t = 0;
         while (t < fadeDur)
@@ -227,6 +454,7 @@ public class GameManager : MonoBehaviour
         int width = _board.Width;
         for (int i = 0; i < width; i++)
         {
+            if (_youreBoned) { yield break; }
             if (i == width - 1)
             {
                 yield return _board.BeginScan(i);

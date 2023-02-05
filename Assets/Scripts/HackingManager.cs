@@ -61,6 +61,8 @@ public class HackingManager
             GameManager.Instance.StopCoroutine(_hack);
         }
         GameManager.Instance.StartCoroutine(_hack = HackEnd(true));
+
+        GameManager.Instance.AudioManager.PlaySFX("UnitVirusConversion");
     }
 
     public void CancelHack()
@@ -72,6 +74,7 @@ public class HackingManager
             GameManager.Instance.StopCoroutine(_hack);
         }
         GameManager.Instance.StartCoroutine(_hack = HackEnd(false));
+        GameManager.Instance.AudioManager.PlaySFX("UnitConvertGood");
     }
 
     public void ClearHacking(bool finish)

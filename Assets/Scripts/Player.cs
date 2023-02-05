@@ -174,6 +174,8 @@ public class Player
         GameManager.Instance.GetStats.SetCorruption(gameBoard.GetCorruption());
 
         GameManager.Instance.Board.ShowMessages(_gridPosition);
+
+        GameManager.Instance.AudioManager.PlaySFX("PlayerBuyTiles");
         return false;
     }
 
@@ -204,6 +206,7 @@ public class Player
                     _path.Add(curPos);
                     _gridPosition = newPos;
 
+                    GameManager.Instance.AudioManager.PlaySFX("PlayerMove", 1.0f, Mathf.Lerp(1.0f, 4, (_path.Count / (16.0f))));
                     GameManager.Instance.UpdatePath();
                     GameManager.Instance.CameraController.SetPosition(board.GridToWorld(newPos));
                     _plrTgt = board.GridToWorld(_gridPosition);
@@ -220,6 +223,8 @@ public class Player
                 case 2:
                     _path.RemoveAt(_path.Count - 1);
                     _gridPosition = newPos;
+
+                    GameManager.Instance.AudioManager.PlaySFX("PlayerMove", 1.0f, Mathf.Lerp(1.0f, 4, (_path.Count / (16.0f))));
 
                     GameManager.Instance.UpdatePath();
                     GameManager.Instance.CameraController.SetPosition(board.GridToWorld(newPos));
